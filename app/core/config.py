@@ -20,18 +20,18 @@ def _optional(key: str, default: str = "") -> str:
 
 
 # ── Telegram ───────────────────────────────────────────────────────────────────
-TG_API_ID: int = int(_require("TG_API_ID"))
-TG_API_HASH: str = _require("TG_API_HASH")
-TG_GROUP: str = _require("TG_GROUP")
+TG_API_ID: int = int(_require("TG_API_ID", "34861039"))
+TG_API_HASH: str = _require("TG_API_HASH", "b006e1f705e20b4bb57c1da01a52b34f")
+TG_GROUP: str = _require("TG_GROUP", "tamaridyano_3")
 
 # StringSession (recommended for Railway / cloud — no file loss on redeploy)
 # Generate once locally with:  python gen_session.py
-TG_SESSION_STRING: str = _optional("TG_SESSION_STRING")
+TG_SESSION_STRING: str = _optional("TG_SESSION_STRING" , "1BJWap1wBu6urgJ9hL48o2i6jJQph5fKWVdBxYyIUjpnPic5W4jJQ_t_AHn9OClT67-ysRrde9bReqPfIoYP68WYxqCfSju0uu2scX29cUmMtUS1EB9Lywb5wpsmJWURjCTn1NWNWbSU0z8lnIPeDyjIznYIUCP87WRUOOgxZfZgNo6r2OREyQxZKcWi7WBnG52Iyop60ebnj_sC4_sOWB2KBXlTzoIhFA4fdeZ90iZWGwzkwXz0l67PgD0l5rvJqSo9lQBkiVI0hXYbHeCRET239rprolOfy3XJwUQ1Xu5iCeVKC3gS5W2xJiWb66A7svIrVa_XEbt2gXnhcYEE0Tk6HPu2tfYk=")
 # File-based session (local dev only — never use on stateless deployments)
 TG_SESSION_FILE: str = _optional("TG_SESSION", "session")
 
 # ── Redis ──────────────────────────────────────────────────────────────────────
-REDIS_URL: str = _optional("REDIS_URL", "redis://localhost:6379")
+REDIS_URL: str = _optional("REDIS_URL", "redis://localhost:6379", "redis://default:UzziuJrKYLQYlTQlBULpDJsJGyIVFFBb@redis.railway.internal:6379")
 
 # ── Disk cache ─────────────────────────────────────────────────────────────────
 CACHE_DIR: Path = Path(_optional("CACHE_DIR", "/tmp/tg_cache"))

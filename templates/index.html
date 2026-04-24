@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>وثائق الصف الثالث الثانوي تمريض</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0984e3;
+            --secondary: #00cec9;
+            --accent: #6c5ce7;
+            --dark: #2d3436;
+            --light: #f8f9fa;
+            --white: #ffffff;
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --radius: 18px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        body {
+            background-color: #f1f3f6;
+            color: var(--dark);
+            font-family: 'Tajawal', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* ── Header المطور ── */
+        header {
+            position: relative;
+            height: 320px;
+            background: url('https://img.freepik.com/free-vector/abstract-medical-wallpaper-design_23-2149116602.jpg') center/cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            padding: 20px;
+            border-bottom-left-radius: 50px;
+            border-bottom-right-radius: 50px;
+            box-shadow: var(--shadow);
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(9, 132, 227, 0.9), rgba(0, 206, 201, 0.8));
+            border-bottom-left-radius: 50px;
+            border-bottom-right-radius: 50px;
+        }
+
+        .header-content { position: relative; z-index: 2; }
+
+        h1 { font-size: 2.3rem; font-weight: 900; text-shadow: 0 2px 10px rgba(0,0,0,0.2); margin-bottom: 10px; }
+
+        .creator-label {
+            margin-top: 15px;
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(12px);
+            padding: 10px 25px;
+            border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.4);
+            cursor: pointer;
+            font-weight: 700;
+            color: white;
+        }
+
+        .creator-label:hover { background: var(--white); color: var(--primary); transform: translateY(-3px); }
+
+        /* ── Main Container ── */
+        .main-container { max-width: 1100px; margin: -50px auto 0; padding: 0 20px; position: relative; z-index: 5; }
+
+        .search-area {
+            background: var(--white);
+            padding: 18px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+
+        .search-box { flex: 1; }
+        
+        #searchInput {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #f1f3f6;
+            border-radius: 12px;
+            outline: none;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        #searchInput:focus { border-color: var(--primary); background: #fdfdfd; }
+
+        #refreshBtn {
+            width: 55px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #refreshBtn:active { transform: scale(0.9) rotate(180deg); }
+
+        /* ── Categories Cards Grid ── */
+        .cat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .cat-card {
+            background: var(--white);
+            padding: 18px 5px;
+            border-radius: 18px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border: 2px solid transparent;
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--dark);
+        }
+
+        .cat-card.active {
+            border-color: var(--primary);
+            background: linear-gradient(to bottom, #ffffff, #f0f7ff);
+            color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(9, 132, 227, 0.15);
+        }
+
+        .cat-card i { display: block; font-size: 1.6rem; margin-bottom: 8px; font-style: normal; }
+
+        /* ── File Grid ── */
+        #fileList {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+            padding-bottom: 50px;
+        }
+
+        .file-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 22px;
+            box-shadow: var(--shadow);
+            position: relative;
+            border: 1px solid rgba(0,0,0,0.03);
+            animation: slideUp 0.5s ease backwards;
+        }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } }
+
+        .file-card:hover { transform: translateY(-8px); border-color: var(--secondary); }
+
+        .file-type-icon {
+            width: 45px; height: 45px;
+            background: #f0f7ff;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .file-name { font-weight: 700; font-size: 0.95rem; margin-bottom: 12px; line-height: 1.4; color: var(--dark); }
+
+        .file-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        .file-badge {
+            font-size: 0.7rem;
+            padding: 4px 12px;
+            background: #eef2ff;
+            color: var(--primary);
+            border-radius: 6px;
+            font-weight: 800;
+        }
+
+        .file-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 22px; }
+        
+        .btn {
+            padding: 12px; border-radius: 10px; text-decoration: none; text-align: center;
+            font-size: 0.85rem; font-weight: 800;
+        }
+        .btn-preview { background: #f1f2f6; color: var(--dark); }
+        .btn-download { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(9, 132, 227, 0.2); }
+
+        /* ── About Card Modal ── */
+        #aboutModal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(45, 52, 54, 0.8); backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center; z-index: 1000;
+            padding: 20px;
+        }
+
+        .about-card {
+            background: white; padding: 35px; border-radius: 30px; width: 100%; max-width: 420px;
+            text-align: center; position: relative; transform: translateY(50px); opacity: 0;
+            transition: all 0.4s ease;
+        }
+
+        .about-card.show { transform: translateY(0); opacity: 1; }
+
+        .profile-img { 
+            width: 90px; height: 90px; background: linear-gradient(135deg, var(--primary), var(--secondary)); 
+            color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px; font-size: 2.2rem; font-weight: 900; box-shadow: 0 8px 20px rgba(9, 132, 227, 0.3);
+        }
+
+        .close-about { position: absolute; top: 20px; right: 25px; font-size: 1.8rem; cursor: pointer; color: #ccc; }
+        .close-about:hover { color: var(--dark); }
+
+        /* ── Mobile ── */
+        @media (max-width: 600px) {
+            h1 { font-size: 1.7rem; }
+            header { height: 280px; border-bottom-left-radius: 35px; border-bottom-right-radius: 35px; }
+            .cat-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+            .cat-card { padding: 15px 2px; border-radius: 14px; }
+            #fileList { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-content">
+        <h1>وثائق الصف الثالث الثانوي تمريض</h1>
+        <p>مكتبتك الرقمية الذكية لتفوقك الدراسي</p>
+        <div class="creator-label" onclick="toggleAbout()">
+        🩺 The creator : Ibrahim Fayez Fawzey
+        </div>
+    </div>
+</header>
+
+<div class="main-container">
+    <div class="search-area">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="ابحث عن مادة، امتحان، أو مذكرة..." oninput="render()">
+        </div>
+        <button id="refreshBtn" onclick="doRefresh()" title="تحديث الملفات">⟳</button>
+    </div>
+
+    <div class="cat-grid" id="catGrid">
+        <div class="cat-card active" onclick="setCat('الكل')"><i>🏥</i>الكل</div>
+        <div class="cat-card" onclick="setCat('امتحانات')"><i>📝</i>امتحانات</div>
+        <div class="cat-card" onclick="setCat('أطفال')"><i>👶</i>أطفال</div>
+        <div class="cat-card" onclick="setCat('نسا')"><i>🤰</i>نسا</div>
+        <div class="cat-card" onclick="setCat('إسعافات')"><i>🚑</i>إسعافات</div>
+        <div class="cat-card" onclick="setCat('صحة')"><i>🏘️</i>صحة</div>
+        <div class="cat-card" onclick="setCat('نفسية')"><i>🧠</i>نفسية</div>
+        <div class="cat-card" onclick="setCat('ترمنولوجي')"><i>📖</i>ترمنولوجي</div>
+        <div class="cat-card" onclick="setCat('ثقافية')"><i>📚</i>ثقافية</div>
+    </div>
+
+    <div id="fileList"></div>
+</div>
+
+<div id="aboutModal" onclick="toggleAbout()">
+    <div class="about-card" onclick="event.stopPropagation()">
+        <span class="close-about" onclick="toggleAbout()">&times;</span>
+        <div class="profile-img">إ</div>
+        <h2 style="color:var(--primary); font-weight:900">إبراهيم فايز فوزي حسن</h2>
+        <p style="margin:10px 0; color:#666; font-weight:700">طالب بالصف الثالث الثانوي تمريض</p>
+        <div style="background: #f0f7ff; padding: 12px; border-radius: 12px; margin: 15px 0;">
+            <p style="font-weight:700; color:var(--primary)">📍 مقيد بالمجمع الطبي الدولي</p>
+        </div>
+        <p style="color:var(--accent); font-weight:700; margin-bottom: 5px;">للتواصل والاستفسار:</p>
+        <a href="tel:01040175436" style="display:inline-block; padding: 10px 20px; background:var(--dark); color:white; border-radius:10px; text-decoration:none; font-weight:900; letter-spacing:1px;">01040175436</a>
+    </div>
+</div>
+
+<script>
+    let allFiles = [];
+    let currentCat = 'الكل';
+
+    // ── تصنيف دلالي شامل ودقيق ──
+    const mapping = {
+        'امتحانات': ['امتحان', 'امتحانات', 'شفوي', 'مراجعة', 'مراجعات', 'اسئلة', 'أسئلة', 'exam'],
+        'أطفال': ['أطفال', 'اطفال', 'طفل', 'طب أطفال', 'تمريض أطفال', 'pediatric'],
+        'نسا': ['نسا', 'توليد', 'مواليد', 'obstetrics'],
+        'إسعافات': ['إسعافات', 'اسعافات', 'طوارئ', 'اسعاف', 'first aid'],
+        'صحة': ['صحة', 'تمريض صحة', 'طب صحة', 'مجتمع', 'community', 'health'],
+        'نفسية': ['نفسية', 'نفسي', 'تمريض نفسية', 'طب نفسية', 'psychiatry'],
+        'ترمنولوجي': ['ترمنولوجي', 'terminology', 'مصطلحات', 'medical terms'],
+        'ثقافية': ['عربي', 'عربية', 'إحصاء', 'احصاء', 'دين', 'وطنية', 'لغة', 'إنجليزي', 'english']
+    };
+
+    function cleanFileName(name) {
+        // حذف كلمات القنوات وأي رموز مزعجة
+        return name.replace(/قناة/g, '')
+                   .replace(/تمريضيانو/g, '')
+                   .replace(/[\-_]/g, ' ')
+                   .replace(/\s+/g, ' ')
+                   .trim();
+    }
+
+    async function loadData() {
+        try {
+            const res = await fetch('/api/files');
+            allFiles = await res.json();
+            render();
+        } catch(e) { console.error("Error fetching files"); }
+    }
+
+    function setCat(cat) {
+        currentCat = cat;
+        document.querySelectorAll('.cat-card').forEach(c => {
+            c.classList.toggle('active', c.innerText.includes(cat));
+        });
+        render();
+    }
+
+    function toggleAbout() {
+        const modal = document.getElementById('aboutModal');
+        const card = modal.querySelector('.about-card');
+        if(modal.style.display === 'flex') {
+            card.classList.remove('show');
+            setTimeout(() => modal.style.display = 'none', 300);
+        } else {
+            modal.style.display = 'flex';
+            setTimeout(() => card.classList.add('show'), 10);
+        }
+    }
+
+    function render() {
+        const list = document.getElementById('fileList');
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        
+        const filtered = allFiles.filter(f => {
+            const name = f.name.toLowerCase();
+            const matchesSearch = name.includes(search);
+            if(currentCat === 'الكل') return matchesSearch;
+            
+            // الفرز الدلالي الذكي
+            const keys = mapping[currentCat] || [];
+            const matchesCat = keys.some(k => name.includes(k));
+            return matchesSearch && matchesCat;
+        });
+
+        list.innerHTML = filtered.map((f, i) => `
+            <div class="file-card" style="animation-delay: ${i*0.04}s">
+                <div class="file-type-icon">📄</div>
+                <div class="file-name">${cleanFileName(f.name)}</div>
+                <div class="file-meta">
+                    <span class="file-badge">القسم: ${detectCategory(f.name)}</span>
+                    <span class="file-badge" style="background:#f1f2f6; color:#777">📦 ${fmtSize(f.size)}</span>
+                </div>
+                <div class="file-actions">
+                    <a href="/api/stream/${f.id}" target="_blank" class="btn btn-preview">👁 معاينة</a>
+                    <a href="/api/stream/${f.id}?dl=1" class="btn btn-download">⬇ تحميل</a>
+                </div>
+            </div>
+        `).join('') || '<div style="grid-column:1/-1;text-align:center;padding:100px 20px;color:#999;font-weight:700">لا توجد ملفات حالياً في هذا القسم.. جرب البحث عن كلمة أخرى</div>';
+    }
+
+    function detectCategory(name) {
+        name = name.toLowerCase();
+        for (let [cat, keys] of Object.entries(mapping)) {
+            if (keys.some(k => name.includes(k))) return cat;
+        }
+        return 'عام';
+    }
+
+    function fmtSize(b){
+        if(!b) return '---';
+        return b < 1048576 ? (b/1024).toFixed(1)+' KB' : (b/1048576).toFixed(1)+' MB';
+    }
+
+    async function doRefresh() {
+        const btn = document.getElementById('refreshBtn');
+        btn.innerHTML = '⌛';
+        try {
+            const res = await fetch('/api/refresh', { method:'POST' });
+            const data = await res.json();
+            allFiles = data.files;
+            render();
+        } catch(e) { alert("فشلت المزامنة!"); }
+        finally { btn.innerHTML = '⟳'; }
+    }
+
+    loadData();
+</script>
+
+</body>
+</html>

@@ -35,7 +35,7 @@ async def lifespan(app: FastAPI):
     # ── Shutdown ───────────────────────────────────────────────────────────────
     await telegram_svc.stop()
     await redis_svc.close()
-
+    print("ENV TG_API_ID =", os.environ.get("TG_API_ID"))
 
 app = FastAPI(
     title="TG PDF Stream",

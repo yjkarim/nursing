@@ -10,6 +10,14 @@
  * ════════════════════════════════════════════════════════════════
  */
 
+const path = window.location.pathname;
+const GROUP =
+  (typeof CONFIG !== 'undefined' && CONFIG.group)
+  ? CONFIG.group
+  : path.includes('.html')
+    ? path.split('/').pop().replace('.html','')
+    : path.split('/').filter(Boolean).pop();
+    
 /* ── Arabic normalizer ───────────────────────────────────────────────────── */
 function normalizeAr(s) {
   return s
@@ -97,8 +105,8 @@ function renderCards(container, files) {
             `<span class="file-badge secondary">📦 ${fmtSize(f.size)}</span>` +
           `</div>` +
           `<div class="file-actions">` +
-            `<a href="/api/stream/${f.id}" target="_blank" class="btn btn-preview">👁 معاينة</a>` +
-            `<a href="/api/stream/${f.id}?dl=1" class="btn btn-download">⬇ تحميل</a>` +
+            `<a href="/api/stream/${f.id}?group=${GROUP}" target="_blank" class="btn btn-preview">👁 معاينة</a>` +
+            `<a href="/api/stream/${f.id}?group=${GROUP}&dl=1" class="btn btn-download">⬇ تحميل</a>` +
           `</div>`;
         frag.appendChild(c);
       });
@@ -110,7 +118,7 @@ function renderCards(container, files) {
 
 /* ── API ─────────────────────────────────────────────────────────────────── */
 async function fetchFiles() {
-  const r = await fetch('/api/files');
+  const r = await fetch(`/api/files?group=${GROUP}`);
   if (!r.ok) throw new Error('HTTP ' + r.status);
   return r.json();
 }
@@ -118,7 +126,7 @@ async function triggerRefresh(btn) {
   const orig = btn.innerHTML;
   btn.innerHTML = '⌛'; btn.disabled = true;
   try {
-    const r = await fetch('/api/refresh', { method: 'POST' });
+    const r = await fetch(`/api/refresh?group=${GROUP}`, { method: 'POST' });
     const d = await r.json();
     return d.files || [];
   } finally { btn.innerHTML = orig; btn.disabled = false; }

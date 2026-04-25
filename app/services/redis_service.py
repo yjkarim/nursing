@@ -1,41 +1,36 @@
 """
-Redis service — async wrapper around redis.asyncio.
+Redis service — async wrapper with graceful degradation.
+Every method works even when Redis is unavailable (falls back to safe defaults).
 
-Design decisions:
-  • Every public method is safe to call when Redis is unavailable.
-    It falls back gracefully so the app remains functional (degraded mode).
-  • No business logic here — just atomic Redis primitives.
-  • Single shared connection pool, created once at app startup.
+Storage design for metadata:
+  tg:meta        → JSON list, TTL=META_TTL  (fast read cache)
+  tg:meta:hash   → Redis Hash keyed by msg_id (persistent, no TTL)
+
+  Having two stores solves two problems:
+    1. tg:meta TTL expiry: hash survives and can rebuild the list
+    2. Redis restart: disk backup rebuilds both
 """
 from __future__ import annotations
-
 import json
 import logging
-from typing import Any, Optional
+from typing import Optional
 
 import redis.asyncio as aioredis
 from redis.asyncio import Redis
 
-from app.core.config import (
-    HITS_TTL, LAST_MSG_KEY, LOCK_TTL,
-    META_TTL, REDIS_URL,
-)
+from config import HITS_TTL, LAST_MSG_KEY, LOCK_TTL, META_TTL, REDIS_URL
 
 log = logging.getLogger("tg.redis")
 
-# ── Redis key schema ───────────────────────────────────────────────────────────
-_K_META      = "tg:meta"            # JSON list of PDF metadata
-_K_HITS      = "tg:hits:{id}"      # per-file hit counter (int)
-_K_LOCK      = "tg:lock:{id}"      # distributed download lock
-_K_DISK_OK   = "tg:disk_ok:{id}"   # flag: file is fully written to disk
+# ── Key schema ─────────────────────────────────────────────────────────────────
+_K_META      = "tg:meta"          # JSON list cache (TTL)
+_K_META_HASH = "tg:meta:hash"     # Hash: msg_id → JSON entry (no TTL, persistent)
+_K_HITS      = "tg:hits:{id}"
+_K_LOCK      = "tg:lock:{id}"
+_K_DISK_OK   = "tg:disk_ok:{id}"
 
 
 class RedisService:
-    """
-    Thin async wrapper. All methods catch exceptions internally and log a
-    warning instead of raising — the app degrades gracefully without Redis.
-    """
-
     def __init__(self) -> None:
         self._r: Optional[Redis] = None
 
@@ -53,7 +48,7 @@ class RedisService:
             await self._r.ping()
             log.info("Redis connected ✓  url=%s", REDIS_URL)
         except Exception as exc:
-            log.warning("Redis unavailable (%s) — running in degraded mode", exc)
+            log.warning("Redis unavailable (%s) — degraded mode (no caching coordination)", exc)
             self._r = None
 
     async def close(self) -> None:
@@ -67,14 +62,14 @@ class RedisService:
     def available(self) -> bool:
         return self._r is not None
 
-    # ── Internal helpers ───────────────────────────────────────────────────────
+    # ── Low-level helpers ──────────────────────────────────────────────────────
 
     async def _get(self, key: str) -> Optional[str]:
         try:
             if self._r:
                 return await self._r.get(key)
         except Exception as exc:
-            log.warning("Redis GET %s failed: %s", key, exc)
+            log.warning("Redis GET %s: %s", key, exc)
         return None
 
     async def _set(self, key: str, value: str, ex: int) -> None:
@@ -82,50 +77,152 @@ class RedisService:
             if self._r:
                 await self._r.set(key, value, ex=ex)
         except Exception as exc:
-            log.warning("Redis SET %s failed: %s", key, exc)
+            log.warning("Redis SET %s: %s", key, exc)
 
     async def _delete(self, *keys: str) -> None:
         try:
             if self._r and keys:
                 await self._r.delete(*keys)
         except Exception as exc:
-            log.warning("Redis DEL failed: %s", exc)
+            log.warning("Redis DEL: %s", exc)
 
-    # ── Metadata ───────────────────────────────────────────────────────────────
+    # ── Metadata — dual storage ────────────────────────────────────────────────
 
     async def get_meta(self) -> Optional[list[dict]]:
+        """
+        Read metadata.
+        Priority:
+          1. tg:meta JSON list (fast, TTL-based cache)
+          2. tg:meta:hash (persistent, rebuilt if list expired)
+        Returns None only when both are empty (truly first run).
+        """
+        # Layer 1: TTL list cache
         raw = await self._get(_K_META)
         if raw:
             try:
-                return json.loads(raw)
+                data = json.loads(raw)
+                if data:  # never return an empty list from cache
+                    return data
             except json.JSONDecodeError:
-                pass
+                log.warning("tg:meta JSON decode error — falling back to hash")
+
+        # Layer 2: Persistent hash (survives TTL expiry and Redis restarts)
+        try:
+            if self._r:
+                hash_data = await self._r.hgetall(_K_META_HASH)
+                if hash_data:
+                    entries = []
+                    for raw_entry in hash_data.values():
+                        try:
+                            entries.append(json.loads(raw_entry))
+                        except json.JSONDecodeError:
+                            continue
+                    if entries:
+                        entries.sort(key=lambda f: f["id"], reverse=True)
+                        log.info(
+                            "Rebuilt metadata from hash store: %d entries", len(entries)
+                        )
+                        # Refresh the TTL list cache from the hash
+                        await self._set(
+                            _K_META,
+                            json.dumps(entries, ensure_ascii=False),
+                            ex=META_TTL,
+                        )
+                        return entries
+        except Exception as exc:
+            log.warning("Redis HGETALL %s: %s", _K_META_HASH, exc)
+
         return None
 
     async def set_meta(self, data: list[dict]) -> None:
-        await self._set(_K_META, json.dumps(data, ensure_ascii=False), ex=META_TTL)
+        """
+        Write metadata to both stores atomically (pipeline).
+        - tg:meta:hash  → persistent, no TTL, keyed by msg_id
+        - tg:meta       → TTL list cache for fast reads
+        Never writes empty data to protect against accidental overwrites.
+        """
+        if not data:
+            log.warning("set_meta called with empty list — refusing to write")
+            return
+
+        try:
+            if self._r:
+                pipe = self._r.pipeline()
+
+                # Build hash mapping: {str(msg_id): JSON entry}
+                hash_mapping = {
+                    str(entry["id"]): json.dumps(entry, ensure_ascii=False)
+                    for entry in data
+                }
+
+                # HSET bulk update — adds/updates entries without deleting others.
+                # This means deleted Telegram messages linger in the hash, but
+                # that is acceptable (they won't appear unless refresh adds them).
+                # Use full replace only on ?full=true (handled by caller passing
+                # the complete merged list).
+                pipe.hset(_K_META_HASH, mapping=hash_mapping)
+
+                # Also store sorted JSON list for fast O(1) reads
+                pipe.set(
+                    _K_META,
+                    json.dumps(data, ensure_ascii=False),
+                    ex=META_TTL,
+                )
+
+                await pipe.execute()
+                log.debug("set_meta: wrote %d entries to hash + list cache", len(data))
+            else:
+                # Redis unavailable — nothing to do here; disk write happens in caller
+                log.debug("set_meta: Redis unavailable, skipping Redis write")
+
+        except Exception as exc:
+            log.warning("Redis set_meta error: %s", exc)
+
+    async def replace_meta(self, data: list[dict]) -> None:
+        """
+        Full replacement — deletes the hash and rewrites from scratch.
+        Used only when ?full=true to remove stale entries.
+        Never replaces with empty data.
+        """
+        if not data:
+            log.warning("replace_meta called with empty list — refusing to replace")
+            return
+        try:
+            if self._r:
+                pipe = self._r.pipeline()
+                pipe.delete(_K_META_HASH)  # wipe old entries
+                hash_mapping = {
+                    str(entry["id"]): json.dumps(entry, ensure_ascii=False)
+                    for entry in data
+                }
+                pipe.hset(_K_META_HASH, mapping=hash_mapping)
+                pipe.set(_K_META, json.dumps(data, ensure_ascii=False), ex=META_TTL)
+                await pipe.execute()
+                log.info("replace_meta: replaced hash with %d entries", len(data))
+        except Exception as exc:
+            log.warning("Redis replace_meta error: %s", exc)
 
     async def invalidate_meta(self) -> None:
+        """Clear the TTL list cache only. Hash stays intact."""
         await self._delete(_K_META)
 
-    # ── Last scanned message id (incremental Telegram scan) ───────────────────
+    # ── Last scanned message id ────────────────────────────────────────────────
 
     async def get_last_msg_id(self) -> int:
         val = await self._get(LAST_MSG_KEY)
         return int(val) if val else 0
 
     async def set_last_msg_id(self, msg_id: int) -> None:
-        # No TTL — we want this to persist across restarts
+        """Stored WITHOUT TTL — must survive Redis restarts."""
         try:
             if self._r:
                 await self._r.set(LAST_MSG_KEY, str(msg_id))
         except Exception as exc:
-            log.warning("Redis set_last_msg_id failed: %s", exc)
+            log.warning("Redis set_last_msg_id: %s", exc)
 
     # ── Hit counter ────────────────────────────────────────────────────────────
 
     async def increment_hits(self, msg_id: int) -> int:
-        """Atomically increment and return the new hit count. Returns 1 on failure."""
         key = _K_HITS.format(id=msg_id)
         try:
             if self._r:
@@ -134,27 +231,21 @@ class RedisService:
                     await self._r.expire(key, HITS_TTL)
                 return count
         except Exception as exc:
-            log.warning("Redis INCR %s failed: %s", key, exc)
+            log.warning("Redis INCR %s: %s", key, exc)
         return 1
 
-    # ── Distributed download lock ──────────────────────────────────────────────
+    # ── Distributed lock ───────────────────────────────────────────────────────
 
     async def acquire_lock(self, msg_id: int) -> bool:
-        """
-        Try to acquire an exclusive download lock for msg_id.
-        Returns True if the lock was acquired (this request should download).
-        Returns False if another request already holds the lock.
-        Uses SET NX EX — atomic, no WATCH/MULTI needed.
-        """
+        """SET NX EX — returns True if this caller won the lock."""
         key = _K_LOCK.format(id=msg_id)
         try:
             if self._r:
                 result = await self._r.set(key, "1", nx=True, ex=LOCK_TTL)
                 return result is True
         except Exception as exc:
-            log.warning("Redis lock acquire %s failed: %s", key, exc)
-        # Fallback: grant the lock (no Redis = no distributed coordination)
-        return True
+            log.warning("Redis lock acquire %s: %s", key, exc)
+        return True  # no Redis → always grant
 
     async def release_lock(self, msg_id: int) -> None:
         await self._delete(_K_LOCK.format(id=msg_id))
@@ -164,7 +255,6 @@ class RedisService:
         return val is not None
 
     # ── Disk-ready flag ────────────────────────────────────────────────────────
-    # Set AFTER atomic rename so readers know the file is complete.
 
     async def mark_disk_ready(self, msg_id: int) -> None:
         await self._set(_K_DISK_OK.format(id=msg_id), "1", ex=HITS_TTL)
@@ -177,5 +267,5 @@ class RedisService:
         await self._delete(_K_DISK_OK.format(id=msg_id))
 
 
-# ── Singleton ──────────────────────────────────────────────────────────────────
+# Singleton
 redis_svc = RedisService()

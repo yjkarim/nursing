@@ -279,22 +279,23 @@
     let currentCat = 'الكل';
     let searchTimeout;
 
-    const mapping = {
-        'مبادئ وأسس': ['مبادئ', 'اسس', 'أسس', 'تمريض', 'أساسيات', 'اساسيات', 'fundamentals', 'nursing'],
+  const mapping = {
         'تشريح': ['تشريح', 'اناطومي', 'anatomy', 'جسم الإنسان', 'العظام'],
         'فسيولوجي': ['فسيولوجي', 'physiology', 'وظائف أعضاء', 'وظائف اعضاء', 'القلب', 'التنفس'],
         'امتحانات': ['امتحان', 'امتحانات', 'exam', 'اسئلة', 'أسئلة', 'مراجعة', 'مراجعات','إمتحان'],
         'ثقافية': ['عربي', 'عربية', 'دين', 'اسلامية', 'إسلامية', 'التربية', 'حاسب', 'إحصاء', 'احصاء', 'لغة', 'إنجليزي', 'english','العلوم','علوم'],
+        'مبادئ وأسس': ['مبادئ', 'اسس', 'أسس', 'أساسيات', 'اساسيات', 'fundamentals', 'nursing'],
         'اخري': []
     };
-
+    
     // Helper functions
     function cleanFileName(name) {
         return name.replace(/قناة|تمريضيانو|[\-_]/g, ' ').replace(/\s+/g, ' ').trim();
     }
 
-    function detectCategory(name) {
-        const lowerName = name.toLowerCase();
+    function detectCategory(cleanName) {
+        const lowerName = cleanName.toLowerCase();
+        // الفحص بالترتيب الجديد
         for (let [cat, keys] of Object.entries(mapping)) {
             if (cat === 'اخري') continue;
             if (keys.some(k => lowerName.includes(k))) return cat;
@@ -312,12 +313,16 @@
      * Calculates categories and names once to save performance during search/filter
      */
     function processFiles(files) {
-        return files.map(f => ({
-            ...f,
-            displayName: cleanFileName(f.name),
-            category: detectCategory(f.name),
-            searchKey: f.name.toLowerCase()
-        }));
+        return files.map(f => {
+            const cleanName = cleanFileName(f.name); // تنظيف الاسم أولاً
+            return {
+                ...f,
+                displayName: cleanName,
+                // الفحص يتم الآن على الاسم المنظف (بدون كلمة تمريضيانو)
+                category: detectCategory(cleanName), 
+                searchKey: f.name.toLowerCase()
+            };
+        });
     }
 
     function render() {

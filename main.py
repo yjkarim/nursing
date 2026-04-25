@@ -16,6 +16,7 @@ from pathlib import Path
 
 from fastapi import FastAPI , HTTPException
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.core.config import HERE, GROUPS  # adjust import if GROUPS lives elsewhere
 from app.core.logging import configure_logging
@@ -45,7 +46,7 @@ app = FastAPI(
 )
 
 app.include_router(router)
-
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
 async def index() -> HTMLResponse:

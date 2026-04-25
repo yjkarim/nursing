@@ -239,7 +239,7 @@
         <h1>وثائق الصف الثالث الثانوي تمريض</h1>
         <p>مكتبتك الرقمية الذكية لتفوقك الدراسي</p>
         <div class="creator-label" onclick="toggleAbout()">
-        🩺 The creator : Ibrahim Fayez
+        🩺 The creator : Ibrahim Fayez Fawzey
         </div>
     </div>
 </header>
@@ -282,6 +282,7 @@
 </div>
 
 <script>
+    const GROUP = new URLSearchParams(window.location.search).get("group") || "grade3";
     let allFiles = [];
     let currentCat = 'الكل';
 
@@ -308,7 +309,7 @@
 
     async function loadData() {
         try {
-            const res = await fetch('/api/files');
+            const res = await fetch(`/api/files?group=${GROUP}`);
             allFiles = await res.json();
             render();
         } catch(e) { console.error("Error fetching files"); }
@@ -358,8 +359,8 @@
                     <span class="file-badge" style="background:#f1f2f6; color:#777">📦 ${fmtSize(f.size)}</span>
                 </div>
                 <div class="file-actions">
-                    <a href="/api/stream/${f.id}" target="_blank" class="btn btn-preview">👁 معاينة</a>
-                    <a href="/api/stream/${f.id}?dl=1" class="btn btn-download">⬇ تحميل</a>
+                    <a href="/api/stream/${f.id}?group=${GROUP}" target="_blank" class="btn btn-preview">👁 معاينة</a>
+                    <a href="/api/stream/${f.id}?group=${GROUP}&dl=1" class="btn btn-download">⬇ تحميل</a>
                 </div>
             </div>
         `).join('') || '<div style="grid-column:1/-1;text-align:center;padding:100px 20px;color:#999;font-weight:700">لا توجد ملفات حالياً في هذا القسم.. جرب البحث عن كلمة أخرى</div>';
@@ -382,7 +383,7 @@
         const btn = document.getElementById('refreshBtn');
         btn.innerHTML = '⌛';
         try {
-            const res = await fetch('/api/refresh', { method:'POST' });
+            const res = await fetch(`/api/refresh?group=${GROUP}`, { method:'POST' });
             const data = await res.json();
             allFiles = data.files;
             render();

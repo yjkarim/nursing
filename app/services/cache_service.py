@@ -8,6 +8,12 @@ Responsibilities:
   • LRU eviction when disk usage exceeds limit
   • ETag computation (size + mtime fingerprint)
 
+# CHANGED: All path helpers and AtomicWriter now accept `group: str`.
+# Each group gets its own subdirectory under CACHE_DIR:
+#   /cache/{group}/{message_id}.pdf
+# This guarantees that message IDs from different groups never collide on disk,
+# even if Telegram assigns the same numeric ID in two different channels.
+
 Thread/concurrency safety:
   • os.replace() is atomic on POSIX and Windows (same filesystem).
   • Files are only marked "ready" in Redis AFTER rename.
@@ -34,16 +40,24 @@ from app.core.config import (
 log = logging.getLogger("tg.cache")
 
 
-# ── Path helpers ───────────────────────────────────────────────────────────────
+# ── Path helpers (per group) ───────────────────────────────────────────────────
 
-def pdf_path(msg_id: int) -> Path:
-    return CACHE_DIR / f"{msg_id}.pdf"
+def _group_dir(group: str) -> Path:
+    """Return (and create) the cache subdirectory for a group."""
+    d = CACHE_DIR / group
+    d.mkdir(parents=True, exist_ok=True)
+    return d
 
-def tmp_path(msg_id: int) -> Path:
-    return CACHE_DIR / f"{msg_id}.pdf.tmp"
+# CHANGED: pdf_path and tmp_path now include the group segment.
+def pdf_path(group: str, msg_id: int) -> Path:
+    return _group_dir(group) / f"{msg_id}.pdf"
 
-def meta_path() -> Path:
-    return CACHE_DIR / "metadata.json"
+def tmp_path(group: str, msg_id: int) -> Path:
+    return _group_dir(group) / f"{msg_id}.pdf.tmp"
+
+# CHANGED: metadata is also stored per group so disk fallback is isolated.
+def meta_path(group: str) -> Path:
+    return _group_dir(group) / "metadata.json"
 
 
 # ── ETag ───────────────────────────────────────────────────────────────────────
@@ -55,42 +69,46 @@ def compute_etag(path: Path) -> str:
     return hashlib.md5(raw.encode()).hexdigest()
 
 
-# ── Metadata (disk fallback) ───────────────────────────────────────────────────
+# ── Metadata (disk fallback, per group) ───────────────────────────────────────
 
-def load_meta_disk() -> list[dict]:
-    """Read metadata.json from disk. Returns [] on any error."""
-    p = meta_path()
+def load_meta_disk(group: str) -> list[dict]:
+    """Read metadata.json for a group from disk. Returns [] on any error."""
+    p = meta_path(group)
     try:
         if p.exists():
             return json.loads(p.read_text("utf-8"))
     except Exception as exc:
-        log.warning("metadata.json read error: %s", exc)
+        log.warning("[group=%s] metadata.json read error: %s", group, exc)
     return []
 
 
-def save_meta_disk(data: list[dict]) -> None:
-    """Atomically write metadata.json to disk."""
-    p   = meta_path()
+def save_meta_disk(group: str, data: list[dict]) -> None:
+    """Atomically write metadata.json for a group to disk."""
+    p   = meta_path(group)
     tmp = p.with_suffix(".tmp")
     try:
         tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2), "utf-8")
         os.replace(tmp, p)
     except Exception as exc:
-        log.warning("metadata.json write error: %s", exc)
+        log.warning("[group=%s] metadata.json write error: %s", group, exc)
         try:
             tmp.unlink(missing_ok=True)
         except Exception:
             pass
 
 
-# ── Atomic writer ──────────────────────────────────────────────────────────────
+# ── Atomic writer (per group) ─────────────────────────────────────────────────
 
 class AtomicWriter:
     """
     Async context manager for safe concurrent disk writes.
 
+    # CHANGED: Accepts group so files land in /cache/{group}/{msg_id}.pdf.
+    # This prevents a message ID from group A from overwriting the same ID
+    # from group B if Telegram reuses numeric IDs across channels.
+
     Usage:
-        async with AtomicWriter(msg_id) as writer:
+        async with AtomicWriter(group, msg_id) as writer:
             async for chunk in source:
                 await writer.write(chunk)
         # File is now on disk and os.replace() has been called.
@@ -99,11 +117,12 @@ class AtomicWriter:
     the final .pdf is NOT created — preventing partial reads.
     """
 
-    def __init__(self, msg_id: int) -> None:
-        self._final = pdf_path(msg_id)
-        self._tmp   = tmp_path(msg_id)
-        self._fh    = None
-        self.success = False
+    def __init__(self, group: str, msg_id: int) -> None:
+        self._final   = pdf_path(group, msg_id)
+        self._tmp     = tmp_path(group, msg_id)
+        self._fh      = None
+        self.success  = False
+        self._group   = group   # kept for log messages only
 
     async def __aenter__(self) -> "AtomicWriter":
         self._fh = await aiofiles.open(self._tmp, "wb")
@@ -114,38 +133,35 @@ class AtomicWriter:
         await self._fh.write(data)
 
     async def __aexit__(self, exc_type, exc_val, exc_tb) -> bool:
-        # Always close the file handle first
         try:
             await self._fh.close()
         except Exception as exc:
-            log.warning("AtomicWriter close error: %s", exc)
+            log.warning("[group=%s] AtomicWriter close error: %s", self._group, exc)
 
         if exc_type is None:
-            # Happy path: rename tmp → final (atomic on POSIX + Windows)
             try:
                 os.replace(self._tmp, self._final)
                 self.success = True
                 log.info(
-                    "Cached to disk: %s (%s bytes)",
+                    "[group=%s] Cached to disk: %s (%s bytes)",
+                    self._group,
                     self._final.name,
                     self._final.stat().st_size,
                 )
             except Exception as exc:
-                log.error("Atomic rename failed: %s", exc)
+                log.error("[group=%s] Atomic rename failed: %s", self._group, exc)
                 self.success = False
         else:
-            # Error path: remove the incomplete temp file
             log.warning(
-                "AtomicWriter aborting due to %s: %s — removing temp file",
-                exc_type.__name__, exc_val,
+                "[group=%s] AtomicWriter aborting due to %s: %s — removing temp file",
+                self._group, exc_type.__name__, exc_val,
             )
             try:
                 self._tmp.unlink(missing_ok=True)
             except Exception:
                 pass
 
-        # Do not suppress exceptions
-        return False
+        return False  # do not suppress exceptions
 
 
 # ── Disk streaming ─────────────────────────────────────────────────────────────
@@ -157,11 +173,7 @@ async def stream_disk(
 ) -> AsyncIterator[bytes]:
     """
     Async generator: read a file from disk supporting byte ranges.
-
-    Args:
-        path:  absolute path to the cached PDF
-        start: byte offset to start reading from (0-indexed, inclusive)
-        end:   last byte to read (inclusive). None = read to EOF.
+    (Unchanged — path already encodes the group via pdf_path().)
     """
     async with aiofiles.open(path, "rb") as f:
         if start > 0:
@@ -183,16 +195,22 @@ async def stream_disk(
             yield chunk
 
 
-# ── LRU eviction ──────────────────────────────────────────────────────────────
+# ── LRU eviction (per group) ──────────────────────────────────────────────────
 
-async def lru_evict() -> None:
+async def lru_evict(group: str) -> None:
     """
-    Delete the oldest cached PDFs until total disk usage < DISK_MAX_BYTES.
+    Delete the oldest cached PDFs for a specific group until total disk usage
+    for that group < DISK_MAX_BYTES.
+
+    # CHANGED: Eviction is now scoped to one group's directory.
+    # This prevents a burst of downloads for grade3 from evicting cached
+    # files that belong to grade1 or grade2.
     Called as a background asyncio.Task after each new file is written.
     """
     try:
+        group_dir = _group_dir(group)
         files = sorted(
-            CACHE_DIR.glob("*.pdf"),
+            group_dir.glob("*.pdf"),
             key=lambda p: p.stat().st_mtime,
         )
         total = sum(p.stat().st_size for p in files)
@@ -203,8 +221,8 @@ async def lru_evict() -> None:
             oldest.unlink(missing_ok=True)
             total -= freed
             log.info(
-                "LRU evicted: %s  freed %.1f MB",
-                oldest.name, freed / 1_048_576,
+                "[group=%s] LRU evicted: %s  freed %.1f MB",
+                group, oldest.name, freed / 1_048_576,
             )
     except Exception as exc:
-        log.warning("LRU eviction error: %s", exc)
+        log.warning("[group=%s] LRU eviction error: %s", group, exc)

@@ -5,6 +5,12 @@ Key design points:
   • Client lives inside FastAPI's own asyncio event loop (no extra threads).
   • Incremental scan: uses min_id to avoid re-reading old messages on refresh.
   • iter_chunks() is a clean async generator — callers own the try/except.
+
+# CHANGED: fetch_pdfs() and iter_chunks() now accept `group: str`.
+# The group slug is resolved to its Telegram entity (username / chat-id)
+# via get_group_id() before any Telegram API call.
+# The single TelegramClient instance is reused for all groups — Telethon
+# resolves entities on-the-fly, so no extra client instances are needed.
 """
 from __future__ import annotations
 
@@ -19,9 +25,9 @@ from app.core.config import (
     CHUNK_SIZE,
     TG_API_HASH,
     TG_API_ID,
-    TG_GROUP,
     TG_SESSION_FILE,
     TG_SESSION_STRING,
+    get_group_id,
 )
 
 log = logging.getLogger("tg.telegram")
@@ -47,26 +53,29 @@ class TelegramService:
     def is_connected(self) -> bool:
         return self._client.is_connected()
 
-    # ── PDF metadata scan ──────────────────────────────────────────────────────
+    # ── PDF metadata scan (per group) ──────────────────────────────────────────
 
-    async def fetch_pdfs(self, min_id: int = 0) -> tuple[list[dict], int]:
+    async def fetch_pdfs(self, group: str, min_id: int = 0) -> tuple[list[dict], int]:
         """
-        Scan the group for PDF messages.
+        Scan the specified group for PDF messages.
+
+        # CHANGED: `group` slug is resolved to Telegram entity via get_group_id().
+        # min_id remains per-group (stored in Redis under tg:{group}:last_msg_id).
 
         Args:
+            group:  group slug ("grade1", "grade2", …)
             min_id: Only fetch messages with id > min_id (incremental scan).
                     Pass 0 for a full scan.
 
         Returns:
             (list of pdf metadata dicts, highest message id seen)
         """
+        tg_entity = get_group_id(group)   # validates slug; raises HTTP 400 if unknown
         results: list[dict] = []
         max_seen_id: int = min_id
 
-        # iter_messages with min_id skips everything already processed.
-        # reverse=True goes oldest→newest so we can track max_seen_id correctly.
         async for msg in self._client.iter_messages(
-            TG_GROUP,
+            tg_entity,
             min_id=min_id,
             reverse=True,   # oldest first — needed for correct min_id tracking
         ):
@@ -90,24 +99,30 @@ class TelegramService:
             results.append({"id": msg.id, "name": name, "size": doc.size})
 
         log.info(
-            "fetch_pdfs: min_id=%s → found %d PDFs, max_id=%s",
-            min_id, len(results), max_seen_id,
+            "[group=%s] fetch_pdfs: min_id=%s → found %d PDFs, max_id=%s",
+            group, min_id, len(results), max_seen_id,
         )
         return results, max_seen_id
 
-    # ── Streaming ──────────────────────────────────────────────────────────────
+    # ── Streaming (per group) ──────────────────────────────────────────────────
 
-    async def iter_chunks(self, msg_id: int) -> AsyncIterator[bytes]:
+    async def iter_chunks(self, group: str, msg_id: int) -> AsyncIterator[bytes]:
         """
         Yield raw PDF bytes from Telegram chunk by chunk.
 
+        # CHANGED: group slug resolves to the correct Telegram entity.
+        # Without this, a msg_id from grade1 could be fetched from grade3's
+        # channel if the old single-group TG_GROUP was still hardcoded.
+
         Raises:
             ValueError: if the message doesn't exist or isn't a PDF document.
+            HTTPException (400): if group slug is unknown (from get_group_id).
         """
-        msg = await self._client.get_messages(TG_GROUP, ids=msg_id)
+        tg_entity = get_group_id(group)
+        msg = await self._client.get_messages(tg_entity, ids=msg_id)
 
         if msg is None:
-            raise ValueError(f"Message {msg_id} not found in group {TG_GROUP!r}")
+            raise ValueError(f"Message {msg_id} not found in group {tg_entity!r}")
 
         if not isinstance(msg.media, MessageMediaDocument):
             raise ValueError(f"Message {msg_id} has no document media")

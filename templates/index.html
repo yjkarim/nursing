@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مكتبة تمريضيانو</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --dark:   #2d3436;
+      --white:  #ffffff;
+      --shadow: 0 10px 30px rgba(0,0,0,.10);
+      /* Grade colors */
+      --c1: #e74c3c;   /* Grade 1 — Red   */
+      --c2: #0984e3;   /* Grade 2 — Blue  */
+      --c3: #00b894;   /* Grade 3 — Green */
+    }
+    *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #f1f3f6;
+      font-family: 'Tajawal', sans-serif;
+      color: var(--dark);
+      overflow-x: hidden;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      padding: 72px 20px 105px;
+      text-align: center;
+      background: url('https://img.freepik.com/free-vector/abstract-medical-wallpaper-design_23-2149116602.jpg') center/cover;
+      border-bottom-left-radius: 60px;
+      border-bottom-right-radius: 60px;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg,rgba(9,132,227,.92),rgba(0,206,201,.85));
+      border-bottom-left-radius: 60px;
+      border-bottom-right-radius: 60px;
+    }
+    .hero-content { position: relative; z-index: 2; color: #fff; }
+
+    .logo {
+      font-size: 3.4rem;
+      display: block;
+      margin-bottom: 14px;
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-10px); }
+    }
+    .hero h1 {
+      font-size: 2.3rem; font-weight: 900;
+      text-shadow: 0 2px 12px rgba(0,0,0,.2);
+      margin-bottom: 10px;
+    }
+    .hero p { font-size: 1.05rem; opacity: .9; font-weight: 500; }
+
+    /* ── Cards section ── */
+    .grades-section {
+      max-width: 950px;
+      margin: -58px auto 0;
+      padding: 0 20px 60px;
+      position: relative; z-index: 5;
+    }
+    .grades-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 22px;
+    }
+
+    @keyframes slideUp { from { opacity:0; transform:translateY(36px); } }
+
+    .grade-card {
+      background: var(--white);
+      border-radius: 24px;
+      padding: 34px 22px;
+      text-align: center;
+      text-decoration: none;
+      color: var(--dark);
+      box-shadow: var(--shadow);
+      border: 2px solid transparent;
+      display: block;
+      animation: slideUp .5s ease backwards;
+      transition: transform .3s, box-shadow .3s, border-color .3s;
+    }
+    .grade-card:nth-child(1) { animation-delay: .08s; }
+    .grade-card:nth-child(2) { animation-delay: .16s; }
+    .grade-card:nth-child(3) { animation-delay: .24s; }
+
+    .grade-card:hover { transform: translateY(-10px); box-shadow: 0 22px 50px rgba(0,0,0,.12); }
+    .g1:hover { border-color: var(--c1); }
+    .g2:hover { border-color: var(--c2); }
+    .g3:hover { border-color: var(--c3); }
+
+    .grade-icon {
+      width: 80px; height: 80px;
+      border-radius: 22px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.1rem;
+      margin: 0 auto 20px;
+      transition: transform .3s;
+    }
+    .grade-card:hover .grade-icon { transform: scale(1.1) rotate(-5deg); }
+
+    /* Grade-specific icon backgrounds */
+    .g1 .grade-icon { background: linear-gradient(135deg,#ffeaea,#fcc); }
+    .g2 .grade-icon { background: linear-gradient(135deg,#dff9fb,#c7ecee); }
+    .g3 .grade-icon { background: linear-gradient(135deg,#d4efdf,#a8e6cf); }
+
+    .grade-card h2 { font-size: 1.25rem; font-weight: 900; margin-bottom: 8px; }
+    .grade-card p  { font-size: .82rem; color: #999; font-weight: 600; margin-bottom: 22px; line-height: 1.6; }
+
+    /* ── Grade number badge ── */
+    .grade-num {
+      display: inline-block;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 900;
+      line-height: 36px;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+    .g1 .grade-num { background: var(--c1); }
+    .g2 .grade-num { background: var(--c2); }
+    .g3 .grade-num { background: var(--c3); }
+
+    .grade-btn {
+      display: inline-block;
+      padding: 10px 30px;
+      border-radius: 50px;
+      font-size: .88rem;
+      font-weight: 800;
+      color: #fff;
+      transition: box-shadow .25s, transform .2s;
+    }
+    .grade-card:hover .grade-btn { box-shadow: 0 6px 20px rgba(0,0,0,.18); transform: scale(1.05); }
+
+    .g1 .grade-btn { background: var(--c1); }
+    .g2 .grade-btn { background: var(--c2); }
+    .g3 .grade-btn { background: var(--c3); }
+
+    /* ── Category preview pills ── */
+    .cat-pills { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-bottom: 18px; }
+    .pill {
+      font-size: .68rem; font-weight: 700;
+      padding: 3px 9px; border-radius: 20px; color: #fff; opacity: .85;
+    }
+    .g1 .pill { background: var(--c1); }
+    .g2 .pill { background: var(--c2); }
+    .g3 .pill { background: var(--c3); }
+
+    /* ── Footer ── */
+    .footer { text-align: center; padding: 18px; color: #bbb; font-size: .82rem; font-weight: 600; }
+
+    /* ── Mobile ── */
+    @media (max-width: 600px) {
+      .hero { padding: 52px 20px 85px; border-radius: 0 0 40px 40px; }
+      .hero::after { border-radius: 0 0 40px 40px; }
+      .hero h1 { font-size: 1.75rem; }
+      .logo { font-size: 2.7rem; }
+      .grades-grid { grid-template-columns: 1fr; }
+      .grades-section { margin-top: -48px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-content">
+    <span class="logo">🏥</span>
+    <h1>مكتبة تمريضيانو</h1>
+    <p>اختر صفك الدراسي وابدأ رحلتك نحو التفوق</p>
+  </div>
+</div>
+
+<div class="grades-section">
+  <div class="grades-grid">
+
+    <!-- Grade 1 — RED -->
+    <a href="grade1.html" class="grade-card g1">
+      <div class="grade-num">١</div>
+      <div class="grade-icon">🌱</div>
+      <h2>الصف الأول</h2>
+      <div class="cat-pills">
+        <span class="pill">مبادئ وأسس</span>
+        <span class="pill">تشريح</span>
+        <span class="pill">فسيولوجي</span>
+        <span class="pill">امتحانات</span>
+      </div>
+      <span class="grade-btn">دخول ←</span>
+    </a>
+
+    <!-- Grade 2 — BLUE -->
+    <a href="grade2.html" class="grade-card g2">
+      <div class="grade-num">٢</div>
+      <div class="grade-icon">🔬</div>
+      <h2>الصف الثاني</h2>
+      <div class="cat-pills">
+        <span class="pill">باطنة وجراحة</span>
+        <span class="pill">صحة المجتمع</span>
+        <span class="pill">طب</span>
+        <span class="pill">امتحانات</span>
+      </div>
+      <span class="grade-btn">دخول ←</span>
+    </a>
+
+    <!-- Grade 3 — GREEN -->
+    <a href="grade3.html" class="grade-card g3">
+      <div class="grade-num">٣</div>
+      <div class="grade-icon">🎓</div>
+      <h2>الصف الثالث</h2>
+      <div class="cat-pills">
+        <span class="pill">أطفال</span>
+        <span class="pill">نسا</span>
+        <span class="pill">إسعافات</span>
+        <span class="pill">نفسية</span>
+      </div>
+      <span class="grade-btn">دخول ←</span>
+    </a>
+
+  </div>
+</div>
+
+<div class="footer">صُنع بـ ❤️ — إبراهيم فايز فوزي حسن</div>
+
+</body>
+</html>

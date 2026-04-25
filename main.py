@@ -59,7 +59,7 @@ async def group_page(group_name: str) -> HTMLResponse:
     Returns 404 if no matching template is found.
     Never intercepts /api/* because those routes are registered first.
     """
-    template = HERE / "templates" / f"{group_name}.html"
+    template = HERE / "templates" / f"{group_name}"
     if not template.exists():
         raise HTTPException(status_code=404, detail=f"Page '{group_name}' not found")
     html = template.read_text("utf-8")

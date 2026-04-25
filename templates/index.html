@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -8,26 +9,28 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #0984e3;
+            --primary: #27ae60; /* Shifted to a modern Nursing Green */
+            --primary-light: rgba(39, 174, 96, 0.1);
             --secondary: #00cec9;
             --accent: #6c5ce7;
             --dark: #2d3436;
-            --light: #f8f9fa;
+            --light: #f1f3f6;
             --white: #ffffff;
-            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --shadow: 0 10px 30px rgba(0,0,0,0.08);
             --radius: 18px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        * { box-sizing: border-box; margin: 0; padding: 0; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s; }
 
         body {
-            background-color: #f1f3f6;
+            background-color: #f4f7f5; /* Subtle green-tinted grey */
             color: var(--dark);
             font-family: 'Tajawal', sans-serif;
             overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* ── Header المطور ── */
+        /* ── Header with Green Overlay ── */
         header {
             position: relative;
             height: 320px;
@@ -41,35 +44,36 @@
             border-bottom-left-radius: 50px;
             border-bottom-right-radius: 50px;
             box-shadow: var(--shadow);
+            will-change: transform;
         }
 
+        /* The requested subtle green overlay */
         header::after {
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, rgba(9, 132, 227, 0.9), rgba(0, 206, 201, 0.8));
+            background: linear-gradient(135deg, rgba(39, 174, 96, 0.85), rgba(0, 206, 201, 0.7));
             border-bottom-left-radius: 50px;
             border-bottom-right-radius: 50px;
+            backdrop-filter: blur(2px);
         }
 
         .header-content { position: relative; z-index: 2; }
 
-        h1 { font-size: 2.3rem; font-weight: 900; text-shadow: 0 2px 10px rgba(0,0,0,0.2); margin-bottom: 10px; }
+        h1 { font-size: 2.3rem; font-weight: 900; text-shadow: 0 2px 10px rgba(0,0,0,0.2); margin-bottom: 10px; color: #fff; }
 
         .creator-label {
             margin-top: 15px;
             display: inline-block;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(12px);
             padding: 10px 25px;
             border-radius: 50px;
-            border: 1px solid rgba(255,255,255,0.4);
+            border: 1px solid rgba(255,255,255,0.3);
             cursor: pointer;
             font-weight: 700;
             color: white;
         }
-
-        .creator-label:hover { background: var(--white); color: var(--primary); transform: translateY(-3px); }
 
         /* ── Main Container ── */
         .main-container { max-width: 1100px; margin: -50px auto 0; padding: 0 20px; position: relative; z-index: 5; }
@@ -81,7 +85,8 @@
             box-shadow: var(--shadow);
             display: flex;
             gap: 15px;
-            margin-bottom: 35px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(39, 174, 96, 0.1);
         }
 
         .search-box { flex: 1; }
@@ -89,14 +94,15 @@
         #searchInput {
             width: 100%;
             padding: 15px 20px;
-            border: 2px solid #f1f3f6;
+            border: 2px solid #edf2ef;
             border-radius: 12px;
             outline: none;
             font-family: inherit;
             font-size: 1rem;
         }
 
-        #searchInput:focus { border-color: var(--primary); background: #fdfdfd; }
+        /* Green stroke on focus */
+        #searchInput:focus { border-color: var(--primary); background: #f9fffb; box-shadow: 0 0 0 4px var(--primary-light); }
 
         #refreshBtn {
             width: 55px;
@@ -111,45 +117,60 @@
             justify-content: center;
         }
 
-        #refreshBtn:active { transform: scale(0.9) rotate(180deg); }
-
-        /* ── Categories Cards Grid ── */
-        .cat-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
-            gap: 12px;
+        /* ── Improved Category Horizontal Scroll ── */
+        .cat-container {
             margin-bottom: 30px;
+            position: relative;
         }
 
+        .cat-grid {
+            display: flex;
+            overflow-x: auto;
+            gap: 12px;
+            padding: 10px 5px 20px;
+            scrollbar-width: none; /* Hide scrollbar Firefox */
+            -ms-overflow-style: none; /* Hide scrollbar IE */
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            cursor: grab;
+        }
+
+        .cat-grid::-webkit-scrollbar { display: none; } /* Hide scrollbar Chrome/Safari */
+
         .cat-card {
+            flex: 0 0 auto;
+            min-width: 110px;
             background: var(--white);
-            padding: 18px 5px;
+            padding: 15px 10px;
             border-radius: 18px;
             text-align: center;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
             border: 2px solid transparent;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-weight: 800;
             color: var(--dark);
+            scroll-snap-align: start;
+            user-select: none;
         }
 
         .cat-card.active {
             border-color: var(--primary);
-            background: linear-gradient(to bottom, #ffffff, #f0f7ff);
+            background: #f0fff4;
             color: var(--primary);
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(9, 132, 227, 0.15);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(39, 174, 96, 0.15);
         }
 
         .cat-card i { display: block; font-size: 1.6rem; margin-bottom: 8px; font-style: normal; }
 
-        /* ── File Grid ── */
+        /* ── Optimized File Grid ── */
         #fileList {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 20px;
             padding-bottom: 50px;
+            min-height: 300px;
         }
 
         .file-card {
@@ -158,17 +179,16 @@
             padding: 22px;
             box-shadow: var(--shadow);
             position: relative;
-            border: 1px solid rgba(0,0,0,0.03);
-            animation: slideUp 0.5s ease backwards;
+            border: 1px solid rgba(0,0,0,0.02);
+            /* Performance: GPU acceleration */
+            transform: translateZ(0); 
         }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } }
-
-        .file-card:hover { transform: translateY(-8px); border-color: var(--secondary); }
+        .file-card:hover { transform: translateY(-5px); border-color: var(--primary); }
 
         .file-type-icon {
             width: 45px; height: 45px;
-            background: #f0f7ff;
+            background: #f0fff4;
             border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
             font-size: 1.2rem; margin-bottom: 15px;
@@ -177,15 +197,15 @@
 
         .file-name { font-weight: 700; font-size: 0.95rem; margin-bottom: 12px; line-height: 1.4; color: var(--dark); }
 
-        .file-meta { display: flex; gap: 8px; flex-wrap: wrap; }
-
         .file-badge {
             font-size: 0.7rem;
             padding: 4px 12px;
-            background: #eef2ff;
+            background: #f1f8f4;
             color: var(--primary);
             border-radius: 6px;
             font-weight: 800;
+            margin-left: 5px;
+            display: inline-block;
         }
 
         .file-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 22px; }
@@ -195,39 +215,35 @@
             font-size: 0.85rem; font-weight: 800;
         }
         .btn-preview { background: #f1f2f6; color: var(--dark); }
-        .btn-download { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(9, 132, 227, 0.2); }
+        .btn-download { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(39, 174, 96, 0.2); }
 
-        /* ── About Card Modal ── */
+        /* ── Modal ── */
         #aboutModal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(45, 52, 54, 0.8); backdrop-filter: blur(8px);
+            position: fixed; inset: 0;
+            background: rgba(45, 52, 54, 0.6); backdrop-filter: blur(8px);
             display: none; align-items: center; justify-content: center; z-index: 1000;
             padding: 20px;
         }
 
         .about-card {
             background: white; padding: 35px; border-radius: 30px; width: 100%; max-width: 420px;
-            text-align: center; position: relative; transform: translateY(50px); opacity: 0;
-            transition: all 0.4s ease;
+            text-align: center; position: relative; opacity: 0; transform: scale(0.9);
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .about-card.show { transform: translateY(0); opacity: 1; }
+        .about-card.show { opacity: 1; transform: scale(1); }
 
         .profile-img { 
             width: 90px; height: 90px; background: linear-gradient(135deg, var(--primary), var(--secondary)); 
             color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 20px; font-size: 2.2rem; font-weight: 900; box-shadow: 0 8px 20px rgba(9, 132, 227, 0.3);
+            margin: 0 auto 20px; font-size: 2.2rem; font-weight: 900;
         }
-
-        .close-about { position: absolute; top: 20px; right: 25px; font-size: 1.8rem; cursor: pointer; color: #ccc; }
-        .close-about:hover { color: var(--dark); }
 
         /* ── Mobile ── */
         @media (max-width: 600px) {
-            h1 { font-size: 1.7rem; }
-            header { height: 280px; border-bottom-left-radius: 35px; border-bottom-right-radius: 35px; }
-            .cat-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-            .cat-card { padding: 15px 2px; border-radius: 14px; }
+            h1 { font-size: 1.6rem; }
+            header { height: 260px; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; }
+            .main-container { margin-top: -40px; }
             #fileList { grid-template-columns: 1fr; }
         }
     </style>
@@ -237,9 +253,9 @@
 <header>
     <div class="header-content">
         <h1>وثائق الصف الثالث الثانوي تمريض</h1>
-        <p>مكتبتك الرقمية الذكية لتفوقك الدراسي</p>
+        <p style="opacity: 0.9; font-weight: 500;">مكتبتك الرقمية الذكية لتفوقك الدراسي</p>
         <div class="creator-label" onclick="toggleAbout()">
-        🩺 The creator : Ibrahim Fayez Fawzey
+        🩺 The creator : Ibrahim Fayez
         </div>
     </div>
 </header>
@@ -247,21 +263,23 @@
 <div class="main-container">
     <div class="search-area">
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="ابحث عن مادة، امتحان، أو مذكرة..." oninput="render()">
+            <input type="text" id="searchInput" placeholder="ابحث عن مادة، امتحان، أو مذكرة..." autocomplete="off">
         </div>
         <button id="refreshBtn" onclick="doRefresh()" title="تحديث الملفات">⟳</button>
     </div>
 
-    <div class="cat-grid" id="catGrid">
-        <div class="cat-card active" onclick="setCat('الكل')"><i>🏥</i>الكل</div>
-        <div class="cat-card" onclick="setCat('امتحانات')"><i>📝</i>امتحانات</div>
-        <div class="cat-card" onclick="setCat('أطفال')"><i>👶</i>أطفال</div>
-        <div class="cat-card" onclick="setCat('نسا')"><i>🤰</i>نسا</div>
-        <div class="cat-card" onclick="setCat('إسعافات')"><i>🚑</i>إسعافات</div>
-        <div class="cat-card" onclick="setCat('صحة')"><i>🏘️</i>صحة</div>
-        <div class="cat-card" onclick="setCat('نفسية')"><i>🧠</i>نفسية</div>
-        <div class="cat-card" onclick="setCat('ترمنولوجي')"><i>📖</i>ترمنولوجي</div>
-        <div class="cat-card" onclick="setCat('ثقافية')"><i>📚</i>ثقافية</div>
+    <div class="cat-container">
+        <div class="cat-grid" id="catGrid">
+            <div class="cat-card active" data-cat="الكل"><i>🏥</i>الكل</div>
+            <div class="cat-card" data-cat="امتحانات"><i>📝</i>امتحانات</div>
+            <div class="cat-card" data-cat="أطفال"><i>👶</i>أطفال</div>
+            <div class="cat-card" data-cat="نسا"><i>🤰</i>نسا</div>
+            <div class="cat-card" data-cat="إسعافات"><i>🚑</i>إسعافات</div>
+            <div class="cat-card" data-cat="صحة"><i>🏘️</i>صحة</div>
+            <div class="cat-card" data-cat="نفسية"><i>🧠</i>نفسية</div>
+            <div class="cat-card" data-cat="ترمنولوجي"><i>📖</i>ترمنولوجي</div>
+            <div class="cat-card" data-cat="ثقافية"><i>📚</i>ثقافية</div>
+        </div>
     </div>
 
     <div id="fileList"></div>
@@ -269,15 +287,14 @@
 
 <div id="aboutModal" onclick="toggleAbout()">
     <div class="about-card" onclick="event.stopPropagation()">
-        <span class="close-about" onclick="toggleAbout()">&times;</span>
+        <span style="position: absolute; top: 20px; right: 25px; font-size: 1.8rem; cursor: pointer; color: #ccc;" onclick="toggleAbout()">&times;</span>
         <div class="profile-img">إ</div>
         <h2 style="color:var(--primary); font-weight:900">إبراهيم فايز فوزي حسن</h2>
         <p style="margin:10px 0; color:#666; font-weight:700">طالب بالصف الثالث الثانوي تمريض</p>
-        <div style="background: #f0f7ff; padding: 12px; border-radius: 12px; margin: 15px 0;">
+        <div style="background: #f0fff4; padding: 12px; border-radius: 12px; margin: 15px 0; border: 1px solid rgba(39,174,96,0.1);">
             <p style="font-weight:700; color:var(--primary)">📍 مقيد بالمجمع الطبي الدولي</p>
         </div>
-        <p style="color:var(--accent); font-weight:700; margin-bottom: 5px;">للتواصل والاستفسار:</p>
-        <a href="tel:01040175436" style="display:inline-block; padding: 10px 20px; background:var(--dark); color:white; border-radius:10px; text-decoration:none; font-weight:900; letter-spacing:1px;">01040175436</a>
+        <a href="tel:01040175436" style="display:inline-block; padding: 12px 25px; background:var(--dark); color:white; border-radius:10px; text-decoration:none; font-weight:900; margin-top:10px;">01040175436</a>
     </div>
 </div>
 
@@ -285,8 +302,8 @@
     const GROUP = new URLSearchParams(window.location.search).get("group") || "grade3";
     let allFiles = [];
     let currentCat = 'الكل';
+    let searchTimeout;
 
-    // ── تصنيف دلالي شامل ودقيق ──
     const mapping = {
         'امتحانات': ['امتحان', 'امتحانات', 'شفوي', 'مراجعة', 'مراجعات', 'اسئلة', 'أسئلة', 'exam'],
         'أطفال': ['أطفال', 'اطفال', 'طفل', 'طب أطفال', 'تمريض أطفال', 'pediatric'],
@@ -298,72 +315,59 @@
         'ثقافية': ['عربي', 'عربية', 'إحصاء', 'احصاء', 'دين', 'وطنية', 'لغة', 'إنجليزي', 'english']
     };
 
+    // Performance Optimization: Cache Clean Name regex
+    const cleanRegex = /قناة|تمريضيانو|[\-_]/g;
     function cleanFileName(name) {
-        // حذف كلمات القنوات وأي رموز مزعجة
-        return name.replace(/قناة/g, '')
-                   .replace(/تمريضيانو/g, '')
-                   .replace(/[\-_]/g, ' ')
-                   .replace(/\s+/g, ' ')
-                   .trim();
+        return name.replace(cleanRegex, ' ').replace(/\s+/g, ' ').trim();
     }
 
-    async function loadData() {
-        try {
-            const res = await fetch(`/api/files?group=${GROUP}`);
-            allFiles = await res.json();
-            render();
-        } catch(e) { console.error("Error fetching files"); }
-    }
-
-    function setCat(cat) {
-        currentCat = cat;
-        document.querySelectorAll('.cat-card').forEach(c => {
-            c.classList.toggle('active', c.innerText.includes(cat));
-        });
-        render();
-    }
-
-    function toggleAbout() {
-        const modal = document.getElementById('aboutModal');
-        const card = modal.querySelector('.about-card');
-        if(modal.style.display === 'flex') {
-            card.classList.remove('show');
-            setTimeout(() => modal.style.display = 'none', 300);
-        } else {
-            modal.style.display = 'flex';
-            setTimeout(() => card.classList.add('show'), 10);
-        }
-    }
-
+    // Performance: Use requestAnimationFrame for smooth UI updates
     function render() {
-        const list = document.getElementById('fileList');
-        const search = document.getElementById('searchInput').value.toLowerCase();
-        
-        const filtered = allFiles.filter(f => {
-            const name = f.name.toLowerCase();
-            const matchesSearch = name.includes(search);
-            if(currentCat === 'الكل') return matchesSearch;
+        requestAnimationFrame(() => {
+            const list = document.getElementById('fileList');
+            const search = document.getElementById('searchInput').value.toLowerCase();
             
-            // الفرز الدلالي الذكي
-            const keys = mapping[currentCat] || [];
-            const matchesCat = keys.some(k => name.includes(k));
-            return matchesSearch && matchesCat;
-        });
+            const filtered = allFiles.filter(f => {
+                const name = f.name.toLowerCase();
+                const matchesSearch = name.includes(search);
+                if(currentCat === 'الكل') return matchesSearch;
+                
+                const keys = mapping[currentCat] || [];
+                return matchesSearch && keys.some(k => name.includes(k));
+            });
 
-        list.innerHTML = filtered.map((f, i) => `
-            <div class="file-card" style="animation-delay: ${i*0.04}s">
-                <div class="file-type-icon">📄</div>
-                <div class="file-name">${cleanFileName(f.name)}</div>
-                <div class="file-meta">
-                    <span class="file-badge">القسم: ${detectCategory(f.name)}</span>
-                    <span class="file-badge" style="background:#f1f2f6; color:#777">📦 ${fmtSize(f.size)}</span>
-                </div>
-                <div class="file-actions">
-                    <a href="/api/stream/${f.id}?group=${GROUP}" target="_blank" class="btn btn-preview">👁 معاينة</a>
-                    <a href="/api/stream/${f.id}?group=${GROUP}&dl=1" class="btn btn-download">⬇ تحميل</a>
-                </div>
-            </div>
-        `).join('') || '<div style="grid-column:1/-1;text-align:center;padding:100px 20px;color:#999;font-weight:700">لا توجد ملفات حالياً في هذا القسم.. جرب البحث عن كلمة أخرى</div>';
+            // Use DocumentFragment for high performance DOM injection
+            const fragment = document.createDocumentFragment();
+            
+            if (filtered.length === 0) {
+                const empty = document.createElement('div');
+                empty.style.cssText = "grid-column:1/-1;text-align:center;padding:100px 20px;color:#999;font-weight:700";
+                empty.innerText = "لا توجد ملفات حالياً في هذا القسم..";
+                fragment.appendChild(empty);
+            } else {
+                filtered.forEach((f, i) => {
+                    const card = document.createElement('div');
+                    card.className = 'file-card';
+                    card.style.animation = `slideUp 0.4s ease backwards ${i * 0.03}s`;
+                    card.innerHTML = `
+                        <div class="file-type-icon">📄</div>
+                        <div class="file-name">${cleanFileName(f.name)}</div>
+                        <div class="file-meta">
+                            <span class="file-badge">القسم: ${detectCategory(f.name)}</span>
+                            <span class="file-badge" style="background:#f1f2f6; color:#777">📦 ${fmtSize(f.size)}</span>
+                        </div>
+                        <div class="file-actions">
+                            <a href="/api/stream/${f.id}?group=${GROUP}" target="_blank" class="btn btn-preview">👁 معاينة</a>
+                            <a href="/api/stream/${f.id}?group=${GROUP}&dl=1" class="btn btn-download">⬇ تحميل</a>
+                        </div>
+                    `;
+                    fragment.appendChild(card);
+                });
+            }
+
+            list.innerHTML = '';
+            list.appendChild(fragment);
+        });
     }
 
     function detectCategory(name) {
@@ -379,9 +383,49 @@
         return b < 1048576 ? (b/1024).toFixed(1)+' KB' : (b/1048576).toFixed(1)+' MB';
     }
 
+    // UX: Efficient category selection
+    document.getElementById('catGrid').addEventListener('click', (e) => {
+        const card = e.target.closest('.cat-card');
+        if (!card) return;
+        
+        currentCat = card.dataset.cat;
+        document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        
+        // Scroll to keep item in view on mobile
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        render();
+    });
+
+    // UX: Debounced Search Input
+    document.getElementById('searchInput').addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(render, 150);
+    });
+
+    async function loadData() {
+        try {
+            const res = await fetch(`/api/files?group=${GROUP}`);
+            allFiles = await res.json();
+            render();
+        } catch(e) { console.error("Error fetching files"); }
+    }
+
+    function toggleAbout() {
+        const modal = document.getElementById('aboutModal');
+        const card = modal.querySelector('.about-card');
+        if(modal.style.display === 'flex') {
+            card.classList.remove('show');
+            setTimeout(() => modal.style.display = 'none', 300);
+        } else {
+            modal.style.display = 'flex';
+            setTimeout(() => card.classList.add('show'), 10);
+        }
+    }
+
     async function doRefresh() {
         const btn = document.getElementById('refreshBtn');
-        btn.innerHTML = '⌛';
+        btn.innerHTML = '...';
         try {
             const res = await fetch(`/api/refresh?group=${GROUP}`, { method:'POST' });
             const data = await res.json();
@@ -391,8 +435,37 @@
         finally { btn.innerHTML = '⟳'; }
     }
 
+    // Drag to scroll for Desktop UX
+    const slider = document.getElementById('catGrid');
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    slider.addEventListener('mousedown', (e) => {
+        isDown = true; slider.style.cursor = 'grabbing';
+        startX = e.pageX - slider.offsetLeft;
+        scrollLeft = slider.scrollLeft;
+    });
+    slider.addEventListener('mouseleave', () => { isDown = false; slider.style.cursor = 'grab'; });
+    slider.addEventListener('mouseup', () => { isDown = false; slider.style.cursor = 'grab'; });
+    slider.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - slider.offsetLeft;
+        const walk = (x - startX) * 2;
+        slider.scrollLeft = scrollLeft - walk;
+    });
+
     loadData();
 </script>
+
+<style>
+    /* Keyframes kept for animation consistency */
+    @keyframes slideUp { 
+        from { opacity: 0; transform: translateY(20px); } 
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
 
 </body>
 </html>

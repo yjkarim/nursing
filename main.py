@@ -46,7 +46,7 @@ app = FastAPI(
 )
 
 app.include_router(router)
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory="templates/static"), name="static")
 
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
 async def index() -> HTMLResponse:

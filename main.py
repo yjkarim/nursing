@@ -17,7 +17,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 
-from app.core.config import HERE
+from app.core.config import HERE, GROUPS  # adjust import if GROUPS lives elsewhere
 from app.core.logging import configure_logging
 from app.api.routes import router
 from app.services.redis_service import redis_svc
@@ -50,4 +50,17 @@ app.include_router(router)
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
 async def index() -> HTMLResponse:
     html = (HERE / "templates" / "index.html").read_text("utf-8")
+    return HTMLResponse(html)
+
+@app.get("/{group_name}", response_class=HTMLResponse, include_in_schema=False)
+async def group_page(group_name: str) -> HTMLResponse:
+    """
+    Serves templates/{group_name}.html if the file exists.
+    Returns 404 if no matching template is found.
+    Never intercepts /api/* because those routes are registered first.
+    """
+    template = HERE / "templates" / f"{group_name}.html"
+    if not template.exists():
+        raise HTTPException(status_code=404, detail=f"Page '{group_name}' not found")
+    html = template.read_text("utf-8")
     return HTMLResponse(html)

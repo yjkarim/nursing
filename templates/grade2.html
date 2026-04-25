@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -7,10 +8,427 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="shared.css">
+=======
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<<<<<<<< HEAD:templates/index.html
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مكتبة تمريضيانو</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --dark:   #2d3436;
+      --white:  #ffffff;
+      --shadow: 0 10px 30px rgba(0,0,0,.10);
+      /* Grade colors */
+      --c1: #e74c3c;   /* Grade 1 — Red   */
+      --c2: #0984e3;   /* Grade 2 — Blue  */
+      --c3: #00b894;   /* Grade 3 — Green */
+    }
+    *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+========
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>وثائق الصف الثاني الثانوي تمريض</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0984e3; 
+            --primary-light: rgba(9, 132, 227, 0.1);
+            --secondary: #00cec9;
+            --accent: #6c5ce7;
+            --dark: #2d3436;
+            --light: #f1f3f6;
+            --white: #ffffff;
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --radius: 18px;
+        }
+>>>>>>>> 612164f5ed833894c56e710e5d8aa1070aaf369a:templates/grade2.html
+
+    body {
+      min-height: 100vh;
+      background: #f1f3f6;
+      font-family: 'Tajawal', sans-serif;
+      color: var(--dark);
+      overflow-x: hidden;
+    }
+
+<<<<<<<< HEAD:templates/index.html
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      padding: 72px 20px 105px;
+      text-align: center;
+      background: url('https://img.freepik.com/free-vector/abstract-medical-wallpaper-design_23-2149116602.jpg') center/cover;
+      border-bottom-left-radius: 60px;
+      border-bottom-right-radius: 60px;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg,rgba(9,132,227,.92),rgba(0,206,201,.85));
+      border-bottom-left-radius: 60px;
+      border-bottom-right-radius: 60px;
+    }
+    .hero-content { position: relative; z-index: 2; color: #fff; }
+
+    .logo {
+      font-size: 3.4rem;
+      display: block;
+      margin-bottom: 14px;
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-10px); }
+    }
+    .hero h1 {
+      font-size: 2.3rem; font-weight: 900;
+      text-shadow: 0 2px 12px rgba(0,0,0,.2);
+      margin-bottom: 10px;
+    }
+    .hero p { font-size: 1.05rem; opacity: .9; font-weight: 500; }
+========
+        body {
+            background-color: #f1f3f6;
+            color: var(--dark);
+            font-family: 'Tajawal', sans-serif;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        header {
+            position: relative;
+            height: 320px;
+            background: url('https://img.freepik.com/free-vector/abstract-medical-wallpaper-design_23-2149116602.jpg') center/cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            padding: 20px;
+            border-bottom-left-radius: 50px;
+            border-bottom-right-radius: 50px;
+            box-shadow: var(--shadow);
+        }
+>>>>>>>> 612164f5ed833894c56e710e5d8aa1070aaf369a:templates/grade2.html
+
+    /* ── Cards section ── */
+    .grades-section {
+      max-width: 950px;
+      margin: -58px auto 0;
+      padding: 0 20px 60px;
+      position: relative; z-index: 5;
+    }
+    .grades-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 22px;
+    }
+
+<<<<<<<< HEAD:templates/index.html
+    @keyframes slideUp { from { opacity:0; transform:translateY(36px); } }
+
+    .grade-card {
+      background: var(--white);
+      border-radius: 24px;
+      padding: 34px 22px;
+      text-align: center;
+      text-decoration: none;
+      color: var(--dark);
+      box-shadow: var(--shadow);
+      border: 2px solid transparent;
+      display: block;
+      animation: slideUp .5s ease backwards;
+      transition: transform .3s, box-shadow .3s, border-color .3s;
+    }
+    .grade-card:nth-child(1) { animation-delay: .08s; }
+    .grade-card:nth-child(2) { animation-delay: .16s; }
+    .grade-card:nth-child(3) { animation-delay: .24s; }
+
+    .grade-card:hover { transform: translateY(-10px); box-shadow: 0 22px 50px rgba(0,0,0,.12); }
+    .g1:hover { border-color: var(--c1); }
+    .g2:hover { border-color: var(--c2); }
+    .g3:hover { border-color: var(--c3); }
+
+    .grade-icon {
+      width: 80px; height: 80px;
+      border-radius: 22px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.1rem;
+      margin: 0 auto 20px;
+      transition: transform .3s;
+    }
+    .grade-card:hover .grade-icon { transform: scale(1.1) rotate(-5deg); }
+
+    /* Grade-specific icon backgrounds */
+    .g1 .grade-icon { background: linear-gradient(135deg,#ffeaea,#fcc); }
+    .g2 .grade-icon { background: linear-gradient(135deg,#dff9fb,#c7ecee); }
+    .g3 .grade-icon { background: linear-gradient(135deg,#d4efdf,#a8e6cf); }
+
+    .grade-card h2 { font-size: 1.25rem; font-weight: 900; margin-bottom: 8px; }
+    .grade-card p  { font-size: .82rem; color: #999; font-weight: 600; margin-bottom: 22px; line-height: 1.6; }
+
+    /* ── Grade number badge ── */
+    .grade-num {
+      display: inline-block;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 900;
+      line-height: 36px;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+    .g1 .grade-num { background: var(--c1); }
+    .g2 .grade-num { background: var(--c2); }
+    .g3 .grade-num { background: var(--c3); }
+
+    .grade-btn {
+      display: inline-block;
+      padding: 10px 30px;
+      border-radius: 50px;
+      font-size: .88rem;
+      font-weight: 800;
+      color: #fff;
+      transition: box-shadow .25s, transform .2s;
+    }
+    .grade-card:hover .grade-btn { box-shadow: 0 6px 20px rgba(0,0,0,.18); transform: scale(1.05); }
+========
+        .header-content { position: relative; z-index: 2; }
+        h1 { font-size: 2.3rem; font-weight: 900; text-shadow: 0 2px 10px rgba(0,0,0,0.2); margin-bottom: 10px; }
+
+        .creator-label {
+            margin-top: 15px;
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(12px);
+            padding: 10px 25px;
+            border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.4);
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .main-container { max-width: 1100px; margin: -50px auto 0; padding: 0 20px; position: relative; z-index: 5; }
+
+        .search-area {
+            background: var(--white);
+            padding: 18px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .search-box { flex: 1; }
+        #searchInput {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #f1f3f6;
+            border-radius: 12px;
+            outline: none;
+            font-family: inherit;
+        }
+        #searchInput:focus { border-color: var(--primary); background: #fdfdfd; }
+>>>>>>>> 612164f5ed833894c56e710e5d8aa1070aaf369a:templates/grade2.html
+
+    .g1 .grade-btn { background: var(--c1); }
+    .g2 .grade-btn { background: var(--c2); }
+    .g3 .grade-btn { background: var(--c3); }
+
+<<<<<<<< HEAD:templates/index.html
+    /* ── Category preview pills ── */
+    .cat-pills { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-bottom: 18px; }
+    .pill {
+      font-size: .68rem; font-weight: 700;
+      padding: 3px 9px; border-radius: 20px; color: #fff; opacity: .85;
+    }
+    .g1 .pill { background: var(--c1); }
+    .g2 .pill { background: var(--c2); }
+    .g3 .pill { background: var(--c3); }
+
+    /* ── Footer ── */
+    .footer { text-align: center; padding: 18px; color: #bbb; font-size: .82rem; font-weight: 600; }
+
+    /* ── Mobile ── */
+    @media (max-width: 600px) {
+      .hero { padding: 52px 20px 85px; border-radius: 0 0 40px 40px; }
+      .hero::after { border-radius: 0 0 40px 40px; }
+      .hero h1 { font-size: 1.75rem; }
+      .logo { font-size: 2.7rem; }
+      .grades-grid { grid-template-columns: 1fr; }
+      .grades-section { margin-top: -48px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-content">
+    <span class="logo">🏥</span>
+    <h1>مكتبة تمريضيانو</h1>
+    <p>اختر صفك الدراسي وابدأ رحلتك نحو التفوق</p>
+  </div>
+</div>
+
+<div class="grades-section">
+  <div class="grades-grid">
+
+    <!-- Grade 1 — RED -->
+    <a href="grade1.html" class="grade-card g1">
+      <div class="grade-num">١</div>
+      <div class="grade-icon">🌱</div>
+      <h2>الصف الأول</h2>
+      <div class="cat-pills">
+        <span class="pill">مبادئ وأسس</span>
+        <span class="pill">تشريح</span>
+        <span class="pill">فسيولوجي</span>
+        <span class="pill">امتحانات</span>
+      </div>
+      <span class="grade-btn">دخول ←</span>
+    </a>
+
+    <!-- Grade 2 — BLUE -->
+    <a href="grade2.html" class="grade-card g2">
+      <div class="grade-num">٢</div>
+      <div class="grade-icon">🔬</div>
+      <h2>الصف الثاني</h2>
+      <div class="cat-pills">
+        <span class="pill">باطنة وجراحة</span>
+        <span class="pill">صحة المجتمع</span>
+        <span class="pill">طب</span>
+        <span class="pill">امتحانات</span>
+      </div>
+      <span class="grade-btn">دخول ←</span>
+    </a>
+
+    <!-- Grade 3 — GREEN -->
+    <a href="grade3.html" class="grade-card g3">
+      <div class="grade-num">٣</div>
+      <div class="grade-icon">🎓</div>
+      <h2>الصف الثالث</h2>
+      <div class="cat-pills">
+        <span class="pill">أطفال</span>
+        <span class="pill">نسا</span>
+        <span class="pill">إسعافات</span>
+        <span class="pill">نفسية</span>
+      </div>
+      <span class="grade-btn">دخول ←</span>
+    </a>
+
+  </div>
+</div>
+
+<div class="footer">صُنع بـ ❤️ — إبراهيم فايز فوزي حسن</div>
+========
+        /* ── Categories Bar ── */
+        .cat-container { margin-bottom: 30px; position: relative; }
+        .cat-grid {
+            display: flex;
+            overflow-x: auto;
+            gap: 12px;
+            padding: 10px 5px 20px;
+            scrollbar-width: none;
+            scroll-snap-type: x mandatory;
+            cursor: grab;
+        }
+        .cat-grid::-webkit-scrollbar { display: none; }
+
+        .cat-card {
+            flex: 0 0 auto;
+            min-width: 110px;
+            background: var(--white);
+            padding: 15px 10px;
+            border-radius: 18px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            border: 2px solid transparent;
+            font-size: 0.85rem;
+            font-weight: 800;
+            scroll-snap-align: start;
+        }
+
+        .cat-card.active {
+            border-color: var(--primary);
+            background: #f0f7ff;
+            color: var(--primary);
+            transform: translateY(-5px);
+        }
+
+        .cat-card i { display: block; font-size: 1.6rem; margin-bottom: 8px; font-style: normal; }
+
+        /* ── File Grid ── */
+        #fileList {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+            padding-bottom: 50px;
+        }
+
+        .file-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 22px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .file-card:hover { transform: translateY(-8px); border-color: var(--primary); }
+
+        .file-type-icon {
+            width: 45px; height: 45px;
+            background: #f0f7ff;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .file-name { font-weight: 700; font-size: 0.95rem; margin-bottom: 12px; color: var(--dark); }
+
+        .file-badge {
+            font-size: 0.7rem;
+            padding: 4px 12px;
+            background: #eef2ff;
+            color: var(--primary);
+            border-radius: 6px;
+            font-weight: 800;
+            margin-left: 5px;
+        }
+
+        .file-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 22px; }
+        .btn { padding: 12px; border-radius: 10px; text-decoration: none; text-align: center; font-size: 0.85rem; font-weight: 800; }
+        .btn-preview { background: #f1f2f6; color: var(--dark); }
+        .btn-download { background: var(--primary); color: white; }
+
+        #aboutModal {
+            position: fixed; inset: 0; background: rgba(45, 52, 54, 0.6); backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+        }
+        .about-card { background: white; padding: 35px; border-radius: 30px; width: 100%; max-width: 420px; text-align: center; opacity: 0; transform: scale(0.9); }
+        .about-card.show { opacity: 1; transform: scale(1); }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.7rem; }
+            #fileList { grid-template-columns: 1fr; }
+        }
+    </style>
+>>>>>>> 612164f5ed833894c56e710e5d8aa1070aaf369a
 </head>
 <body>
 
 <header>
+<<<<<<< HEAD
   <div class="header-content">
     <a href="index.html" class="back-link">← الرئيسية</a>
     <h1>وثائق الصف الثاني الثانوي تمريض</h1>
@@ -137,5 +555,204 @@ const CONFIG = {
 
 GradeApp.init(CONFIG);
 </script>
+=======
+    <div class="header-content">
+        <h1>وثائق الصف الثاني الثانوي تمريض</h1>
+        <p>مكتبتك الرقمية الذكية لتفوقك الدراسي</p>
+        <div class="creator-label" onclick="toggleAbout()">
+        🩺 The creator : Ibrahim Fayez
+        </div>
+    </div>
+</header>
+
+<div class="main-container">
+    <div class="search-area">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="ابحث عن مادة، امتحان، أو مذكرة..." autocomplete="off">
+        </div>
+        <button id="refreshBtn" onclick="doRefresh()" title="تحديث الملفات">⟳</button>
+    </div>
+
+    <div class="cat-container">
+        <div class="cat-grid" id="catGrid">
+            <div class="cat-card active" data-cat="الكل"><i>🏥</i>الكل</div>
+            <div class="cat-card" data-cat="باطنة وجراحة"><i>🩺</i>باطنة وجراحة</div>
+            <div class="cat-card" data-cat="صحة"><i>🏘️</i>صحة المجتمع</div>
+            <div class="cat-card" data-cat="طب"><i>🧪</i>طب</div>
+            <div class="cat-card" data-cat="امتحانات"><i>📝</i>امتحانات</div>
+            <div class="cat-card" data-cat="ثقافية"><i>📚</i>ثقافية</div>
+            <div class="cat-card" data-cat="أخرى"><i>📁</i>مواد أخرى</div>
+        </div>
+    </div>
+
+    <div id="fileList"></div>
+</div>
+
+<div id="aboutModal" onclick="toggleAbout()">
+    <div class="about-card" onclick="event.stopPropagation()">
+        <h2 style="color:var(--primary); font-weight:900">إبراهيم فايز فوزي حسن</h2>
+        <p style="margin:10px 0; color:#666; font-weight:700">طالب بالصف الثاث الثانوي تمريض</p>
+        <div style="background: #f0f7ff; padding: 12px; border-radius: 12px; margin: 15px 0;">
+            <p style="font-weight:700; color:var(--primary)">📍 مقيد بالمجمع الطبي الدولي</p>
+        </div>
+        <a href="tel:01040175436" style="display:inline-block; padding: 10px 20px; background:var(--dark); color:white; border-radius:10px; text-decoration:none; font-weight:900;">01040175436</a>
+    </div>
+</div>
+
+<script>
+    const GROUP = new URLSearchParams(window.location.search).get("group") || "grade2";
+    let allFiles = [];
+    let currentCat = 'الكل';
+    let searchTimeout;
+
+ // تحديث الأقسام المنظم
+    const mapping = {
+        'باطنة وجراحة': ['باطنة', 'باطنه', 'جراحة', 'جراحه', 'internal', 'surgical', 'تمريض باطنة', 'الجراحي', 'الباطني'],
+        'صحة': ['صحة', 'صحه', 'مجتمع', 'community', 'تمريض صحة'],
+        'طب': ['طب', 'فارما', 'أدوية', 'تحاليل', 'medical', 'pharma', 'ميكروبيولوجي'],
+        'امتحانات': ['امتحان', 'امتحانات', 'exam', 'اسئلة', 'أسئلة', 'مراجعة', 'مراجعات', 'حل', 'للشفوي', 'شفوي', 'إمتحانات'],
+        'ثقافية': [
+            'عربي', 'عربية', 'دين', 'اسلامية', 'إسلامية', 'احياء', 'أحياء', 'حاسب', 'إحصاء', 
+            'احصاء', 'لغة', 'إنجليزي', 'english', 'علم', 'التربية', 'التربيه', 'الفيزياء', 
+            'بلاغة', 'الأدب', 'الجرامر', 'أدب', 'فيزياء', 'اقتصاد', 'الأقتصاد', 'الكيمياء', 
+            'الانجليزي', 'الانجلش', 'انجلش','العلوم',
+        ],
+        'أخرى': [] // تترك فارغة للتعامل معها برمجياً في دالة detectCategory
+    };
+
+    
+    function cleanFileName(name) {
+        return name.replace(/قناة|تمريضيانو|[\-_]/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+
+    function detectCategory(name) {
+        name = name.toLowerCase();
+        for (let [cat, keys] of Object.entries(mapping)) {
+            if (cat === 'أخرى') continue;
+            if (keys.some(k => name.includes(k))) return cat;
+        }
+        return 'أخرى';
+    }
+
+    function render() {
+        requestAnimationFrame(() => {
+            const list = document.getElementById('fileList');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            
+            const filtered = allFiles.filter(f => {
+                const name = f.name.toLowerCase();
+                const matchesSearch = name.includes(search);
+                if(currentCat === 'الكل') return matchesSearch;
+                
+                const fileCat = detectCategory(f.name);
+                return matchesSearch && (fileCat === currentCat);
+            });
+
+            const fragment = document.createDocumentFragment();
+            
+            if (filtered.length === 0) {
+                const empty = document.createElement('div');
+                empty.style.cssText = "grid-column:1/-1;text-align:center;padding:100px 20px;color:#999;font-weight:700";
+                empty.innerText = "لا توجد ملفات في هذا القسم حالياً..";
+                fragment.appendChild(empty);
+            } else {
+                filtered.forEach((f, i) => {
+                    const card = document.createElement('div');
+                    card.className = 'file-card';
+                    card.style.animation = `slideUp 0.4s ease backwards ${i * 0.03}s`;
+                    card.innerHTML = `
+                        <div class="file-type-icon">📄</div>
+                        <div class="file-name">${cleanFileName(f.name)}</div>
+                        <div class="file-meta">
+                            <span class="file-badge">القسم: ${detectCategory(f.name)}</span>
+                            <span class="file-badge" style="background:#f1f2f6; color:#777">📦 ${fmtSize(f.size)}</span>
+                        </div>
+                        <div class="file-actions">
+                            <a href="/api/stream/${f.id}?group=${GROUP}" target="_blank" class="btn btn-preview">👁 معاينة</a>
+                            <a href="/api/stream/${f.id}?group=${GROUP}&dl=1" class="btn btn-download">⬇ تحميل</a>
+                        </div>
+                    `;
+                    fragment.appendChild(card);
+                });
+            }
+            list.innerHTML = '';
+            list.appendChild(fragment);
+        });
+    }
+
+    function fmtSize(b){
+        if(!b) return '---';
+        return b < 1048576 ? (b/1024).toFixed(1)+' KB' : (b/1048576).toFixed(1)+' MB';
+    }
+
+    document.getElementById('catGrid').addEventListener('click', (e) => {
+        const card = e.target.closest('.cat-card');
+        if (!card) return;
+        currentCat = card.dataset.cat;
+        document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        render();
+    });
+
+    document.getElementById('searchInput').addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(render, 150);
+    });
+
+    async function loadData() {
+        try {
+            const res = await fetch(`/api/files?group=${GROUP}`);
+            allFiles = await res.json();
+            render();
+        } catch(e) { console.error("Error loading files"); }
+    }
+
+    function toggleAbout() {
+        const modal = document.getElementById('aboutModal');
+        const card = modal.querySelector('.about-card');
+        if(modal.style.display === 'flex') {
+            card.classList.remove('show');
+            setTimeout(() => modal.style.display = 'none', 300);
+        } else {
+            modal.style.display = 'flex';
+            setTimeout(() => card.classList.add('show'), 10);
+        }
+    }
+
+    async function doRefresh() {
+        const btn = document.getElementById('refreshBtn');
+        btn.innerHTML = '⌛';
+        try {
+            const res = await fetch(`/api/refresh?group=${GROUP}`, { method:'POST' });
+            const data = await res.json();
+            allFiles = data.files;
+            render();
+        } catch(e) { alert("فشلت المزامنة!"); }
+        finally { btn.innerHTML = '⟳'; }
+    }
+
+    // Drag to scroll for categories
+    const slider = document.getElementById('catGrid');
+    let isDown = false, startX, scrollLeft;
+    slider.addEventListener('mousedown', (e) => { isDown = true; startX = e.pageX - slider.offsetLeft; scrollLeft = slider.scrollLeft; });
+    slider.addEventListener('mouseleave', () => isDown = false);
+    slider.addEventListener('mouseup', () => isDown = false);
+    slider.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        const x = e.pageX - slider.offsetLeft;
+        const walk = (x - startX) * 2;
+        slider.scrollLeft = scrollLeft - walk;
+    });
+
+    loadData();
+</script>
+>>>>>>>> 612164f5ed833894c56e710e5d8aa1070aaf369a:templates/grade2.html
+
+<style>
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+
+>>>>>>> 612164f5ed833894c56e710e5d8aa1070aaf369a
 </body>
 </html>

@@ -1,0 +1,396 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>وثائق الصف الثاني الثانوي تمريض</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0984e3; 
+            --primary-light: rgba(9, 132, 227, 0.1);
+            --secondary: #00cec9;
+            --accent: #6c5ce7;
+            --dark: #2d3436;
+            --light: #f1f3f6;
+            --white: #ffffff;
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --radius: 18px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        body {
+            background-color: #f1f3f6;
+            color: var(--dark);
+            font-family: 'Tajawal', sans-serif;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        header {
+            position: relative;
+            height: 320px;
+            background: url('https://img.freepik.com/free-vector/abstract-medical-wallpaper-design_23-2149116602.jpg') center/cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            padding: 20px;
+            border-bottom-left-radius: 50px;
+            border-bottom-right-radius: 50px;
+            box-shadow: var(--shadow);
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(9, 132, 227, 0.9), rgba(0, 206, 201, 0.8));
+            border-bottom-left-radius: 50px;
+            border-bottom-right-radius: 50px;
+        }
+
+        .header-content { position: relative; z-index: 2; }
+        h1 { font-size: 2.3rem; font-weight: 900; text-shadow: 0 2px 10px rgba(0,0,0,0.2); margin-bottom: 10px; }
+
+        .creator-label {
+            margin-top: 15px;
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(12px);
+            padding: 10px 25px;
+            border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.4);
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .main-container { max-width: 1100px; margin: -50px auto 0; padding: 0 20px; position: relative; z-index: 5; }
+
+        .search-area {
+            background: var(--white);
+            padding: 18px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .search-box { flex: 1; }
+        #searchInput {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #f1f3f6;
+            border-radius: 12px;
+            outline: none;
+            font-family: inherit;
+        }
+        #searchInput:focus { border-color: var(--primary); background: #fdfdfd; }
+
+        #refreshBtn {
+            width: 55px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ── Categories Bar ── */
+        .cat-container { margin-bottom: 30px; position: relative; }
+        .cat-grid {
+            display: flex;
+            overflow-x: auto;
+            gap: 12px;
+            padding: 10px 5px 20px;
+            scrollbar-width: none;
+            scroll-snap-type: x mandatory;
+            cursor: grab;
+        }
+        .cat-grid::-webkit-scrollbar { display: none; }
+
+        .cat-card {
+            flex: 0 0 auto;
+            min-width: 110px;
+            background: var(--white);
+            padding: 15px 10px;
+            border-radius: 18px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            border: 2px solid transparent;
+            font-size: 0.85rem;
+            font-weight: 800;
+            scroll-snap-align: start;
+        }
+
+        .cat-card.active {
+            border-color: var(--primary);
+            background: #f0f7ff;
+            color: var(--primary);
+            transform: translateY(-5px);
+        }
+
+        .cat-card i { display: block; font-size: 1.6rem; margin-bottom: 8px; font-style: normal; }
+
+        /* ── File Grid ── */
+        #fileList {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+            padding-bottom: 50px;
+        }
+
+        .file-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 22px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .file-card:hover { transform: translateY(-8px); border-color: var(--primary); }
+
+        .file-type-icon {
+            width: 45px; height: 45px;
+            background: #f0f7ff;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .file-name { font-weight: 700; font-size: 0.95rem; margin-bottom: 12px; color: var(--dark); }
+
+        .file-badge {
+            font-size: 0.7rem;
+            padding: 4px 12px;
+            background: #eef2ff;
+            color: var(--primary);
+            border-radius: 6px;
+            font-weight: 800;
+            margin-left: 5px;
+        }
+
+        .file-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 22px; }
+        .btn { padding: 12px; border-radius: 10px; text-decoration: none; text-align: center; font-size: 0.85rem; font-weight: 800; }
+        .btn-preview { background: #f1f2f6; color: var(--dark); }
+        .btn-download { background: var(--primary); color: white; }
+
+        #aboutModal {
+            position: fixed; inset: 0; background: rgba(45, 52, 54, 0.6); backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+        }
+        .about-card { background: white; padding: 35px; border-radius: 30px; width: 100%; max-width: 420px; text-align: center; opacity: 0; transform: scale(0.9); }
+        .about-card.show { opacity: 1; transform: scale(1); }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.7rem; }
+            #fileList { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-content">
+        <h1>وثائق الصف الثاني الثانوي تمريض</h1>
+        <p>مكتبتك الرقمية الذكية لتفوقك الدراسي</p>
+        <div class="creator-label" onclick="toggleAbout()">
+        🩺 The creator : Ibrahim Fayez
+        </div>
+    </div>
+</header>
+
+<div class="main-container">
+    <div class="search-area">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="ابحث عن مادة، امتحان، أو مذكرة..." autocomplete="off">
+        </div>
+        <button id="refreshBtn" onclick="doRefresh()" title="تحديث الملفات">⟳</button>
+    </div>
+
+    <div class="cat-container">
+        <div class="cat-grid" id="catGrid">
+            <div class="cat-card active" data-cat="الكل"><i>🏥</i>الكل</div>
+            <div class="cat-card" data-cat="باطنة وجراحة"><i>🩺</i>باطنة وجراحة</div>
+            <div class="cat-card" data-cat="صحة"><i>🏘️</i>صحة المجتمع</div>
+            <div class="cat-card" data-cat="طب"><i>🧪</i>طب</div>
+            <div class="cat-card" data-cat="امتحانات"><i>📝</i>امتحانات</div>
+            <div class="cat-card" data-cat="ثقافية"><i>📚</i>ثقافية</div>
+            <div class="cat-card" data-cat="أخرى"><i>📁</i>مواد أخرى</div>
+        </div>
+    </div>
+
+    <div id="fileList"></div>
+</div>
+
+<div id="aboutModal" onclick="toggleAbout()">
+    <div class="about-card" onclick="event.stopPropagation()">
+        <h2 style="color:var(--primary); font-weight:900">إبراهيم فايز فوزي حسن</h2>
+        <p style="margin:10px 0; color:#666; font-weight:700">طالب بالصف الثاني الثانوي تمريض</p>
+        <div style="background: #f0f7ff; padding: 12px; border-radius: 12px; margin: 15px 0;">
+            <p style="font-weight:700; color:var(--primary)">📍 مقيد بالمجمع الطبي الدولي</p>
+        </div>
+        <a href="tel:01040175436" style="display:inline-block; padding: 10px 20px; background:var(--dark); color:white; border-radius:10px; text-decoration:none; font-weight:900;">01040175436</a>
+    </div>
+</div>
+
+<script>
+    const GROUP = new URLSearchParams(window.location.search).get("group") || "grade2";
+    let allFiles = [];
+    let currentCat = 'الكل';
+    let searchTimeout;
+
+    // تحديث الأقسام بناءً على طلبك
+    const mapping = {
+        'باطنة وجراحة': ['باطنة', 'باطنه', 'جراحة', 'جراحه', 'internal', 'surgical', 'تمريض باطنة'],
+        'صحة': ['صحة', 'صحه', 'مجتمع', 'community', 'تمريض صحة'],
+        'طب': ['طب', 'فارما', 'أدوية', 'تحاليل', 'medical', 'pharma', 'ميكروبيولوجي'],
+        'امتحانات': ['امتحان', 'امتحانات', 'exam', 'اسئلة', 'أسئلة', 'مراجعة', 'مراجعات'],
+        'ثقافية': ['عربي', 'عربية', 'دين', 'اسلامية', 'إسلامية', 'احياء' ,'أحياء', 'حاسب', 'إحصاء', 'احصاء', 'لغة', 'إنجليزي', 'english'],
+        'أخرى': [] // تترك فارغة للتعامل معها برمجياً
+    };
+
+    function cleanFileName(name) {
+        return name.replace(/قناة|تمريضيانو|[\-_]/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+
+    function detectCategory(name) {
+        name = name.toLowerCase();
+        for (let [cat, keys] of Object.entries(mapping)) {
+            if (cat === 'أخرى') continue;
+            if (keys.some(k => name.includes(k))) return cat;
+        }
+        return 'أخرى';
+    }
+
+    function render() {
+        requestAnimationFrame(() => {
+            const list = document.getElementById('fileList');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            
+            const filtered = allFiles.filter(f => {
+                const name = f.name.toLowerCase();
+                const matchesSearch = name.includes(search);
+                if(currentCat === 'الكل') return matchesSearch;
+                
+                const fileCat = detectCategory(f.name);
+                return matchesSearch && (fileCat === currentCat);
+            });
+
+            const fragment = document.createDocumentFragment();
+            
+            if (filtered.length === 0) {
+                const empty = document.createElement('div');
+                empty.style.cssText = "grid-column:1/-1;text-align:center;padding:100px 20px;color:#999;font-weight:700";
+                empty.innerText = "لا توجد ملفات في هذا القسم حالياً..";
+                fragment.appendChild(empty);
+            } else {
+                filtered.forEach((f, i) => {
+                    const card = document.createElement('div');
+                    card.className = 'file-card';
+                    card.style.animation = `slideUp 0.4s ease backwards ${i * 0.03}s`;
+                    card.innerHTML = `
+                        <div class="file-type-icon">📄</div>
+                        <div class="file-name">${cleanFileName(f.name)}</div>
+                        <div class="file-meta">
+                            <span class="file-badge">القسم: ${detectCategory(f.name)}</span>
+                            <span class="file-badge" style="background:#f1f2f6; color:#777">📦 ${fmtSize(f.size)}</span>
+                        </div>
+                        <div class="file-actions">
+                            <a href="/api/stream/${f.id}?group=${GROUP}" target="_blank" class="btn btn-preview">👁 معاينة</a>
+                            <a href="/api/stream/${f.id}?group=${GROUP}&dl=1" class="btn btn-download">⬇ تحميل</a>
+                        </div>
+                    `;
+                    fragment.appendChild(card);
+                });
+            }
+            list.innerHTML = '';
+            list.appendChild(fragment);
+        });
+    }
+
+    function fmtSize(b){
+        if(!b) return '---';
+        return b < 1048576 ? (b/1024).toFixed(1)+' KB' : (b/1048576).toFixed(1)+' MB';
+    }
+
+    document.getElementById('catGrid').addEventListener('click', (e) => {
+        const card = e.target.closest('.cat-card');
+        if (!card) return;
+        currentCat = card.dataset.cat;
+        document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        render();
+    });
+
+    document.getElementById('searchInput').addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(render, 150);
+    });
+
+    async function loadData() {
+        try {
+            const res = await fetch(`/api/files?group=${GROUP}`);
+            allFiles = await res.json();
+            render();
+        } catch(e) { console.error("Error loading files"); }
+    }
+
+    function toggleAbout() {
+        const modal = document.getElementById('aboutModal');
+        const card = modal.querySelector('.about-card');
+        if(modal.style.display === 'flex') {
+            card.classList.remove('show');
+            setTimeout(() => modal.style.display = 'none', 300);
+        } else {
+            modal.style.display = 'flex';
+            setTimeout(() => card.classList.add('show'), 10);
+        }
+    }
+
+    async function doRefresh() {
+        const btn = document.getElementById('refreshBtn');
+        btn.innerHTML = '⌛';
+        try {
+            const res = await fetch(`/api/refresh?group=${GROUP}`, { method:'POST' });
+            const data = await res.json();
+            allFiles = data.files;
+            render();
+        } catch(e) { alert("فشلت المزامنة!"); }
+        finally { btn.innerHTML = '⟳'; }
+    }
+
+    // Drag to scroll for categories
+    const slider = document.getElementById('catGrid');
+    let isDown = false, startX, scrollLeft;
+    slider.addEventListener('mousedown', (e) => { isDown = true; startX = e.pageX - slider.offsetLeft; scrollLeft = slider.scrollLeft; });
+    slider.addEventListener('mouseleave', () => isDown = false);
+    slider.addEventListener('mouseup', () => isDown = false);
+    slider.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        const x = e.pageX - slider.offsetLeft;
+        const walk = (x - startX) * 2;
+        slider.scrollLeft = scrollLeft - walk;
+    });
+
+    loadData();
+</script>
+
+<style>
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+
+</body>
+</html>

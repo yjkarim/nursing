@@ -18,7 +18,7 @@ from typing import Optional
 import redis.asyncio as aioredis
 from redis.asyncio import Redis
 
-from config import HITS_TTL, LAST_MSG_KEY, LOCK_TTL, META_TTL, REDIS_URL
+from app.core.config import HITS_TTL, LAST_MSG_KEY, LOCK_TTL, META_TTL, REDIS_URL
 
 log = logging.getLogger("tg.redis")
 

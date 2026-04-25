@@ -34,46 +34,43 @@ log = logging.getLogger("tg.telegram")
 
 
 class TelegramService:
-   def __init__(self) -> None:
-    session = (
-        StringSession(TG_SESSION_STRING)
-        if TG_SESSION_STRING
-        else TG_SESSION_FILE
-    )
+    def __init__(self) -> None:
+        session = (
+            StringSession(TG_SESSION_STRING)
+            if TG_SESSION_STRING
+            else TG_SESSION_FILE
+        )
 
-    self._client = TelegramClient(session, TG_API_ID, TG_API_HASH)
+        self._client = TelegramClient(session, TG_API_ID, TG_API_HASH)
 
-    self._started = False
-    self._lock = asyncio.Lock()
+        self._started = False
+        self._lock = asyncio.Lock()
 
-    # ── Lifecycle ──────────────────────────────────────────────────────────────
-    
+    # ── Lifecycle ─────────────────────────────────────────
+
     async def start(self) -> None:
-    async with self._lock:
-        if self._started:
-            log.warning("Telegram already started — skipping")
+        async with self._lock:
+            if self._started:
+                log.warning("Telegram already started — skipping")
+                return
+
+            self._started = True
+            await self._client.start()
+
+            me = await self._client.get_me()
+            log.info("Telegram connected as %r (id=%s)", me.first_name, me.id)
+
+    async def stop(self) -> None:
+        if not self._started:
             return
 
-        self._started = True
-        await self._client.start()
+        self._started = False
+        await self._client.disconnect()
+        log.info("Telegram disconnected.")
 
-        me = await self._client.get_me()
-        log.info("Telegram connected as %r (id=%s)", me.first_name, me.id)
-      
-   async def stop(self) -> None:
-    if not self._started:
-        return
-
-    self._started = False
-    await self._client.disconnect()
-    log.info("Telegram disconnected.")
-
-    self._started = False
-    await self._client.disconnect()
-     
     def is_connected(self) -> bool:
         return self._client.is_connected()
-
+    
     # ── PDF metadata scan (per group) ──────────────────────────────────────────
 
     async def fetch_pdfs(self, group: str, min_id: int = 0) -> tuple[list[dict], int]:

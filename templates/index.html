@@ -279,6 +279,7 @@
             <div class="cat-card" data-cat="نفسية"><i>🧠</i>نفسية</div>
             <div class="cat-card" data-cat="ترمنولوجي"><i>📖</i>ترمنولوجي</div>
             <div class="cat-card" data-cat="ثقافية"><i>📚</i>ثقافية</div>
+            <div class="cat-card" data-cat="أخرى"><i>📁</i>مواد أخرى</div>
         </div>
     </div>
 
@@ -315,6 +316,7 @@
         'نفسية': ['نفسية', 'نفسي', 'تمريض نفسية', 'طب نفسية', 'psychiatry'],
         'ترمنولوجي': ['ترمنولوجي', 'terminology', 'مصطلحات', 'medical terms'],
         'ثقافية': ['عربي', 'عربية', 'إحصاء', 'احصاء', 'دين', 'وطنية', 'لغة', 'إنجليزي', 'english']
+        'أخرى': [] // تترك فارغة للتعامل معها برمجياً في دالة detectCategory
     };
 
     // Performance Optimization: Cache Clean Name regex
@@ -372,12 +374,13 @@
         });
     }
 
-    function detectCategory(name) {
+   function detectCategory(name) {
         name = name.toLowerCase();
         for (let [cat, keys] of Object.entries(mapping)) {
+            if (cat === 'أخرى') continue;
             if (keys.some(k => name.includes(k))) return cat;
         }
-        return 'عام';
+        return 'أخرى';
     }
 
     function fmtSize(b){

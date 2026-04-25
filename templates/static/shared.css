@@ -147,26 +147,33 @@ h1 {
 #refreshBtn:disabled { opacity: .6; cursor: not-allowed; }
 
 /* ── Category grid ────────────────────────────────────────────────────── */
+
 .cat-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 10px;
-  margin-bottom: 30px;
+    display: flex; 
+    overflow-x: auto; 
+    overflow-y: hidden;
+    white-space: nowrap; 
+    padding: 10px 5px;
+    scroll-behavior: smooth; 
+    scrollbar-width: none; 
+    -ms-overflow-style: none; 
+    
+    
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch; 
+}
+
+.cat-grid::-webkit-scrollbar {
+    display: none;
 }
 
 .cat-card {
-  background: var(--white);
-  padding: 16px 4px;
-  border-radius: 16px;
-  text-align: center;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0,0,0,.04);
-  border: 2px solid transparent;
-  font-size: .78rem;
-  font-weight: 800;
-  color: var(--dark);
-  transition: transform .22s, border-color .22s, background .22s,
-              color .22s, box-shadow .22s;
+    flex: 0 0 auto; 
+    scroll-snap-align: start; 
+    min-width: 100px; 
+    text-align: center;
+    cursor: pointer;
+    user-select: none; 
 }
 .cat-card:hover { transform: translateY(-3px); }
 

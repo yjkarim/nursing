@@ -1,198 +1,176 @@
 /**
- * shared.js — Engine v2
+ * shared.js — Engine v2.2 (Refined & Optimized)
  * ════════════════════════════════════════════════════════════════
- *  • Arabic normalization (alef/hamza/ta-marbuta) so أحياء=احياء
- *  • Multi-token AND search (all words must match)
- *  • Category detection on normalized text — pre-compiled at load
- *  • DocumentFragment + rAF render; animation only on first 40 cards
- *  • Theme injection via CSS custom properties (per-page colors)
- *  • Debounce 150 ms for instant feel
+ * • Performance: DocumentFragment + rAF + Animation Capping
+ * • UX: Drag-to-Scroll + Click Prevention + Skeleton Loaders
+ * • Search: Multi-token Arabic Normalization
  * ════════════════════════════════════════════════════════════════
  */
 
+/* ── 1. Configuration & Constants ── */
 const path = window.location.pathname;
-const GROUP =
-  (typeof CONFIG !== 'undefined' && CONFIG.group)
-  ? CONFIG.group
-  : path.includes('.html')
-    ? path.split('/').pop().replace('.html','')
-    : path.split('/').filter(Boolean).pop();
-    
-/* ── Arabic normalizer ───────────────────────────────────────────────────── */
-function normalizeAr(s) {
-  return s
-    .replace(/[أإآٱ]/g, 'ا')
-    .replace(/ؤ/g, 'و')
-    .replace(/ئ/g, 'ي')
-    .replace(/ة/g, 'ه')
-    .replace(/ى/g, 'ي')
-    .toLowerCase();
-}
+const GROUP = (typeof CONFIG !== 'undefined' && CONFIG.group) 
+    ? CONFIG.group 
+    : (path.includes('.html') ? path.split('/').pop().replace('.html','') : path.split('/').filter(Boolean).pop());
 
-/* ── Debounce ────────────────────────────────────────────────────────────── */
-function debounce(fn, ms = 150) {
-  let t;
-  return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
-}
+/* ── 2. Helpers (Normalization & Performance) ── */
+const normalizeAr = s => s ? s.replace(/[أإآٱ]/g, 'ا').replace(/ؤ/g, 'و').replace(/ئ/g, 'ي').replace(/ة/g, 'ه').replace(/ى/g, 'ي').toLowerCase() : '';
+const debounce = (fn, ms = 150) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+const fmtSize = b => !b ? '---' : b < 1048576 ? (b / 1024).toFixed(1) + ' KB' : (b / 1048576).toFixed(1) + ' MB';
 
-/* ── Format bytes ────────────────────────────────────────────────────────── */
-function fmtSize(b) {
-  if (!b) return '---';
-  return b < 1_048_576 ? (b / 1024).toFixed(1) + ' KB' : (b / 1_048_576).toFixed(1) + ' MB';
-}
-
-/* ── Clean display name (noise words removed) ────────────────────────────── */
-function cleanFileName(raw) {
-  return raw
-    .replace(/قناة\s*/g, '')
-    .replace(/تمريضيانو\s*/g, '')
-    .replace(/[\-_]+/g, ' ')
-    .replace(/\s{2,}/g, ' ')
-    .trim();
-}
-
-/* ── Category detector — compiled once at startup ────────────────────────── */
-function makeDetector(mapping) {
-  const compiled = Object.entries(mapping).map(([cat, keys]) => [
-    cat, keys.map(normalizeAr),
-  ]);
-  return function detect(normName) {
-    for (const [cat, keys] of compiled) {
-      if (keys.some(k => normName.includes(k))) return cat;
-    }
-    return 'أخري';
-  };
-}
-
-/* ── Preprocess all files once ───────────────────────────────────────────── */
-function processFiles(files, detect) {
-  return files.map(f => {
-    const display = cleanFileName(f.name);
-    const norm    = normalizeAr(display);
-    return { ...f, display, category: detect(norm), norm };
-  });
-}
-
-/* ── Multi-token AND filter ──────────────────────────────────────────────── */
-function filterFiles(list, cat, query) {
-  const tokens = normalizeAr(query).trim().split(/\s+/).filter(Boolean);
-  return list.filter(f => {
-    if (cat !== 'الكل' && f.category !== cat) return false;
-    return tokens.every(t => f.norm.includes(t));
-  });
-}
-
-/* ── Render (DocumentFragment, rAF, capped animation) ───────────────────── */
-function renderCards(container, files) {
-  requestAnimationFrame(() => {
-    const frag = document.createDocumentFragment();
-    if (!files.length) {
-      const d = document.createElement('div');
-      d.className   = 'empty-state';
-      d.textContent = 'لا توجد ملفات في هذا القسم.. جرب كلمة بحث أخرى';
-      frag.appendChild(d);
-    } else {
-      files.forEach((f, i) => {
-        const c = document.createElement('div');
-        c.className = 'file-card';
-        if (i >= 40) c.style.animation = 'none';
-        else         c.style.animationDelay = (i * 0.028) + 's';
-        c.innerHTML =
-          `<div class="file-type-icon">📄</div>` +
-          `<div class="file-name">${f.display}</div>` +
-          `<div class="file-meta">` +
-            `<span class="file-badge cat-badge">القسم: ${f.category}</span>` +
-            `<span class="file-badge secondary">📦 ${fmtSize(f.size)}</span>` +
-          `</div>` +
-          `<div class="file-actions">` +
-            `<a href="/api/stream/${f.id}?group=${GROUP}" target="_blank" class="btn btn-preview">👁 معاينة</a>` +
-            `<a href="/api/stream/${f.id}?group=${GROUP}&dl=1" class="btn btn-download">⬇ تحميل</a>` +
-          `</div>`;
-        frag.appendChild(c);
-      });
-    }
-    container.innerHTML = '';
-    container.appendChild(frag);
-  });
-}
-
-/* ── API ─────────────────────────────────────────────────────────────────── */
-async function fetchFiles() {
-  const r = await fetch(`/api/files?group=${GROUP}`);
-  if (!r.ok) throw new Error('HTTP ' + r.status);
-  return r.json();
-}
-async function triggerRefresh(btn) {
-  const orig = btn.innerHTML;
-  btn.innerHTML = '⌛'; btn.disabled = true;
-  try {
-    const r = await fetch(`/api/refresh?group=${GROUP}`, { method: 'POST' });
-    const d = await r.json();
-    return d.files || [];
-  } finally { btn.innerHTML = orig; btn.disabled = false; }
-}
-
-/* ── Theme applicator ────────────────────────────────────────────────────── */
-function applyTheme({ primary, activeBg, activeShadow, headerGrad, badgeBg, dlShadow }) {
-  const s = document.documentElement.style;
-  s.setProperty('--pg',  primary);       // page-primary color
-  s.setProperty('--pab', activeBg);      // cat active background
-  s.setProperty('--pas', activeShadow);  // cat active shadow
-  s.setProperty('--phg', headerGrad);    // header overlay gradient
-  s.setProperty('--pbb', badgeBg);       // badge background
-  s.setProperty('--pds', dlShadow);      // download btn shadow
-}
-
-/* ── GradeApp ────────────────────────────────────────────────────────────── */
-const GradeApp = {
-  init(CONFIG) {
-    if (CONFIG.theme) applyTheme(CONFIG.theme);
-
-    let all = [], currentCat = 'الكل';
-    const detect    = makeDetector(CONFIG.mapping);
-    const list      = document.getElementById('fileList');
-    const search    = document.getElementById('searchInput');
-    const refreshBtn= document.getElementById('refreshBtn');
-    const catCards  = document.querySelectorAll('.cat-card');
-
-    const render = () => renderCards(list, filterFiles(all, currentCat, search.value));
-
-    const setCat = cat => {
-      currentCat = cat;
-      catCards.forEach(c => c.classList.toggle('active', c.dataset.cat === cat));
-      render();
+const getIcon = (cat) => {
+    const icons = { 
+        'امتحانات': '📝', 'أطفال': '👶', 'نسا': '🤰', 
+        'إسعافات': '🚑', 'صحة': '🏘️', 'نفسية': '🧠', 
+        'ترمنولوجي': '📖', 'ثقافية': '📚', 'الكل': '🏥' 
     };
+    return icons[cat] || '📄';
+};
 
-    catCards.forEach(c => c.addEventListener('click', () => setCat(c.dataset.cat)));
-    search.addEventListener('input', debounce(render, 150));
+/* ── 3. Core Engine Functions ── */
+function renderCards(container, files) {
+    requestAnimationFrame(() => {
+        const frag = document.createDocumentFragment();
+        
+        if (!files.length) {
+            container.innerHTML = '<div class="empty-state">لا توجد ملفات حالياً.. جرب كلمة بحث أخرى</div>';
+            return;
+        }
 
-    refreshBtn.addEventListener('click', async () => {
-      try { all = processFiles(await triggerRefresh(refreshBtn), detect); render(); }
-      catch { alert('فشلت المزامنة!'); }
+        files.forEach((f, i) => {
+            const c = document.createElement('div');
+            c.className = 'file-card';
+            
+            // Performance: Cap animations to first 40 cards to save CPU/GPU
+            if (i >= 40) c.style.animation = 'none';
+            else c.style.animationDelay = `${i * 0.028}s`;
+
+            c.innerHTML = `
+                <div class="file-type-icon">${getIcon(f.category)}</div>
+                <div class="file-name">${f.display}</div>
+                <div class="file-meta">
+                    <span class="file-badge cat-badge" style="background:var(--pbb)">${f.category}</span>
+                    <span class="file-badge secondary">📦 ${fmtSize(f.size)}</span>
+                </div>
+                <div class="file-actions">
+                    <a href="/api/stream/${f.id}?group=${GROUP}" target="_blank" class="btn btn-preview">👁 معاينة</a>
+                    <a href="/api/stream/${f.id}?group=${GROUP}&dl=1" class="btn btn-download" style="box-shadow: 0 4px 10px var(--pds)">⬇ تحميل</a>
+                </div>`;
+            frag.appendChild(c);
+        });
+        
+        container.innerHTML = '';
+        container.appendChild(frag);
+    });
+}
+
+/* ── 4. Interaction (Horizontal Drag Logic) ── */
+function initDragScroll() {
+    const slider = document.querySelector('.cat-grid');
+    if (!slider) return;
+
+    let isDown = false, startX, scrollLeft, moved = false;
+
+    slider.addEventListener('mousedown', (e) => {
+        isDown = true;
+        moved = false;
+        slider.classList.add('active-drag');
+        startX = e.pageX - slider.offsetLeft;
+        scrollLeft = slider.scrollLeft;
     });
 
-    /* About modal */
-    const modal = document.getElementById('aboutModal');
-    if (modal) {
-      window.toggleAbout = () => {
-        const card = modal.querySelector('.about-card');
-        if (modal.style.display === 'flex') {
-          card.classList.remove('show');
-          setTimeout(() => (modal.style.display = 'none'), 300);
-        } else {
-          modal.style.display = 'flex';
-          setTimeout(() => card.classList.add('show'), 10);
-        }
-      };
-      modal.addEventListener('click', e => { if (e.target === modal) toggleAbout(); });
-    }
+    slider.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        const x = e.pageX - slider.offsetLeft;
+        const walk = (x - startX) * 2; // Scroll Speed
+        if (Math.abs(walk) > 5) moved = true; // Identify as drag if moved > 5px
+        slider.scrollLeft = scrollLeft - walk;
+    });
 
-    /* Load */
-    list.innerHTML = '<div class="empty-state" style="opacity:.35">جارٍ التحميل...</div>';
-    fetchFiles()
-      .then(files => { all = processFiles(files, detect); render(); })
-      .catch(() => {
-        list.innerHTML = '<div class="empty-state">فشل تحميل الملفات. تحقق من الاتصال.</div>';
-      });
-  },
+    const stopDrag = () => { 
+        isDown = false; 
+        slider.classList.remove('active-drag'); 
+    };
+    
+    slider.addEventListener('mouseup', stopDrag);
+    slider.addEventListener('mouseleave', stopDrag);
+
+    // Prevent accidental clicks on categories while dragging
+    slider.addEventListener('click', (e) => {
+        if (moved) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+        }
+    }, true);
+}
+
+/* ── 5. Main Application Logic ── */
+const GradeApp = {
+    init(CONFIG) {
+        // Theme injection via CSS variables
+        if (CONFIG.theme) {
+            const s = document.documentElement.style;
+            s.setProperty('--pg', CONFIG.theme.primary);
+            s.setProperty('--pab', CONFIG.theme.activeBg);
+            s.setProperty('--pas', CONFIG.theme.activeShadow);
+            s.setProperty('--pbb', CONFIG.theme.badgeBg);
+            s.setProperty('--pds', CONFIG.theme.dlShadow);
+        }
+
+        // Pre-compile category detection for faster filtering
+        const compiledMapping = Object.entries(CONFIG.mapping).map(([cat, keys]) => [
+            cat, keys.map(normalizeAr)
+        ]);
+
+        const detect = (norm) => {
+            for (const [cat, keys] of compiledMapping) {
+                if (keys.some(k => norm.includes(k))) return cat;
+            }
+            return 'أخري';
+        };
+
+        let all = [], currentCat = 'الكل';
+        const list = document.getElementById('fileList');
+        const search = document.getElementById('searchInput');
+        const catCards = document.querySelectorAll('.cat-card');
+
+        const render = () => {
+            const query = normalizeAr(search.value).trim();
+            const tokens = query.split(/\s+/).filter(Boolean);
+            
+            const filtered = all.filter(f => {
+                if (currentCat !== 'الكل' && f.category !== currentCat) return false;
+                return tokens.every(t => f.norm.includes(t));
+            });
+            renderCards(list, filtered);
+        };
+
+        // UI Events
+        catCards.forEach(c => c.addEventListener('click', () => {
+            currentCat = c.dataset.cat;
+            catCards.forEach(card => card.classList.toggle('active', card.dataset.cat === currentCat));
+            render();
+        }));
+
+        search.addEventListener('input', debounce(render, 150));
+
+        // Initial Setup
+        list.innerHTML = Array(6).fill('<div class="skeleton-card"></div>').join('');
+        initDragScroll();
+
+        // Data Fetching
+        fetch(`/api/files?group=${GROUP}`)
+            .then(r => r.json())
+            .then(files => {
+                all = files.map(f => {
+                    const display = f.name.replace(/قناة\s*|تمريضيانو\s*|[\-_]+/g, ' ').trim();
+                    const norm = normalizeAr(display);
+                    return { ...f, display, category: detect(norm), norm };
+                });
+                render();
+            })
+            .catch(() => {
+                list.innerHTML = '<div class="empty-state">فشل تحميل الملفات. تحقق من الاتصال بالخادم.</div>';
+            });
+    }
 };

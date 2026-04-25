@@ -1,174 +1,173 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>مكتبة وثائق التمريض</title>
+  <title>الدليل الشامل لطلاب التمريض</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
   <style>
     :root {
       --dark:   #2d3436;
       --white:  #ffffff;
-      --shadow: 0 10px 30px rgba(0,0,0,.10);
-      /* Grade colors */
-      --c1: #e74c3c;   /* Grade 1 — Red   */
-      --c2: #0984e3;   /* Grade 2 — Blue  */
-      --c3: #00b894;   /* Grade 3 — Green */
+      --bg:     #f4f7f6;
+      
+      /* Gradients */
+      --c1: #e74c3c; --grad-red: linear-gradient(135deg, #ff7675, #d63031);
+      --c2: #0984e3; --grad-blue: linear-gradient(135deg, #74b9ff, #0984e3);
+      --c3: #2ecc71; --grad-green: linear-gradient(135deg, #55efc4, #27ae60);
     }
+
     *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       min-height: 100vh;
-      background: #f1f3f6;
+      background: var(--bg);
       font-family: 'Tajawal', sans-serif;
       color: var(--dark);
       overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    /* ── Hero ── */
+    /* ── Hero Section ── */
     .hero {
       position: relative;
-      padding: 72px 20px 105px;
+      padding: 50px 20px 90px;
       text-align: center;
       background: url('https://img.freepik.com/free-vector/abstract-medical-wallpaper-design_23-2149116602.jpg') center/cover;
-      border-bottom-left-radius: 60px;
-      border-bottom-right-radius: 60px;
-      overflow: hidden;
+      border-bottom-left-radius: 40px;
+      border-bottom-right-radius: 40px;
     }
     .hero::after {
       content: '';
       position: absolute; inset: 0;
-      background: linear-gradient(135deg,rgba(9,132,227,.92),rgba(0,206,201,.85));
-      border-bottom-left-radius: 60px;
-      border-bottom-right-radius: 60px;
+      background: linear-gradient(135deg, rgba(45, 52, 54, 0.8), rgba(9, 132, 227, 0.85));
+      border-bottom-left-radius: 40px;
+      border-bottom-right-radius: 40px;
     }
     .hero-content { position: relative; z-index: 2; color: #fff; }
+    .hero h1 { font-size: 2rem; font-weight: 900; margin-bottom: 8px; }
+    .hero p { font-size: 0.95rem; opacity: 0.9; font-weight: 500; }
 
-    .logo {
-      font-size: 3.4rem;
-      display: block;
-      margin-bottom: 14px;
-      animation: float 3s ease-in-out infinite;
-    }
-    @keyframes float {
-      0%,100% { transform: translateY(0); }
-      50%      { transform: translateY(-10px); }
-    }
-    .hero h1 {
-      font-size: 2.3rem; font-weight: 900;
-      text-shadow: 0 2px 12px rgba(0,0,0,.2);
-      margin-bottom: 10px;
-    }
-    .hero p { font-size: 1.05rem; opacity: .9; font-weight: 500; }
-
-    /* ── Cards section ── */
+    /* ── Grades Grid ── */
     .grades-section {
-      max-width: 950px;
-      margin: -58px auto 0;
-      padding: 0 20px 60px;
+      max-width: 1000px;
+      margin: -45px auto 0;
+      padding: 0 15px 60px;
       position: relative; z-index: 5;
     }
     .grades-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 22px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      justify-items: center;
     }
-
-    @keyframes slideUp { from { opacity:0; transform:translateY(36px); } }
 
     .grade-card {
       background: var(--white);
-      border-radius: 24px;
-      padding: 34px 22px;
+      border-radius: 22px;
+      padding: 25px 20px;
       text-align: center;
       text-decoration: none;
       color: var(--dark);
-      box-shadow: var(--shadow);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       border: 2px solid transparent;
-      display: block;
-      animation: slideUp .5s ease backwards;
-      transition: transform .3s, box-shadow .3s, border-color .3s;
+      width: 100%;
+      max-width: 320px;
     }
-    .grade-card:nth-child(1) { animation-delay: .08s; }
-    .grade-card:nth-child(2) { animation-delay: .16s; }
-    .grade-card:nth-child(3) { animation-delay: .24s; }
 
-    .grade-card:hover { transform: translateY(-10px); box-shadow: 0 22px 50px rgba(0,0,0,.12); }
+    .g1 { border-color: rgba(231, 76, 60, 0.15); }
+    .g2 { border-color: rgba(9, 132, 227, 0.15); }
+    .g3 { border-color: rgba(46, 204, 113, 0.15); }
+
+    .grade-card:hover { 
+      transform: translateY(-6px); 
+      box-shadow: 0 15px 30px rgba(0,0,0,0.08); 
+    }
     .g1:hover { border-color: var(--c1); }
     .g2:hover { border-color: var(--c2); }
     .g3:hover { border-color: var(--c3); }
 
+    /* Realistic Scrub Icon Styling */
     .grade-icon {
       width: 80px; height: 80px;
-      border-radius: 22px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 2.1rem;
-      margin: 0 auto 20px;
-      transition: transform .3s;
+      margin-bottom: 12px;
+      transition: transform 0.3s ease;
     }
-    .grade-card:hover .grade-icon { transform: scale(1.1) rotate(-5deg); }
-
-    /* Grade-specific icon backgrounds */
-    .g1 .grade-icon { background: linear-gradient(135deg,#ffeaea,#fcc); }
-    .g2 .grade-icon { background: linear-gradient(135deg,#dff9fb,#c7ecee); }
-    .g3 .grade-icon { background: linear-gradient(135deg,#d4efdf,#a8e6cf); }
+    .icon-svg { width: 100%; height: 100%; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
+    .g1 .icon-svg { fill: var(--c1); }
+    .g2 .icon-svg { fill: var(--c2); }
+    .g3 .icon-svg { fill: var(--c3); }
 
     .grade-card h2 { font-size: 1.25rem; font-weight: 900; margin-bottom: 8px; }
-    .grade-card p  { font-size: .82rem; color: #999; font-weight: 600; margin-bottom: 22px; line-height: 1.6; }
 
-    /* ── Grade number badge ── */
     .grade-num {
       display: inline-block;
-      width: 36px; height: 36px;
-      border-radius: 50%;
+      width: 32px; height: 32px;
+      border-radius: 10px;
       color: #fff;
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: 900;
-      line-height: 36px;
+      line-height: 32px;
       text-align: center;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
     }
-    .g1 .grade-num { background: var(--c1); }
-    .g2 .grade-num { background: var(--c2); }
-    .g3 .grade-num { background: var(--c3); }
+    .g1 .grade-num { background: var(--grad-red); }
+    .g2 .grade-num { background: var(--grad-blue); }
+    .g3 .grade-num { background: var(--grad-green); }
 
     .grade-btn {
+      margin-top: auto;
       display: inline-block;
-      padding: 10px 30px;
-      border-radius: 50px;
-      font-size: .88rem;
+      padding: 10px 24px;
+      border-radius: 12px;
+      font-size: 0.88rem;
       font-weight: 800;
       color: #fff;
-      transition: box-shadow .25s, transform .2s;
+      transition: all 0.3s ease;
     }
-    .grade-card:hover .grade-btn { box-shadow: 0 6px 20px rgba(0,0,0,.18); transform: scale(1.05); }
+    .g1 .grade-btn { background: var(--grad-red); }
+    .g2 .grade-btn { background: var(--grad-blue); }
+    .g3 .grade-btn { background: var(--grad-green); }
 
-    .g1 .grade-btn { background: var(--c1); }
-    .g2 .grade-btn { background: var(--c2); }
-    .g3 .grade-btn { background: var(--c3); }
+    .grade-card:hover .grade-btn { opacity: 0.9; transform: scale(1.03); }
 
-    /* ── Category preview pills ── */
-    .cat-pills { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-bottom: 18px; }
+    .cat-pills { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 18px; }
     .pill {
-      font-size: .68rem; font-weight: 700;
-      padding: 3px 9px; border-radius: 20px; color: #fff; opacity: .85;
+      font-size: 0.68rem; font-weight: 700;
+      padding: 4px 10px; border-radius: 8px; 
+      background: #f0f2f5; color: #5f6368;
     }
-    .g1 .pill { background: var(--c1); }
-    .g2 .pill { background: var(--c2); }
-    .g3 .pill { background: var(--c3); }
 
     /* ── Footer ── */
-    .footer { text-align: center; padding: 18px; color: #bbb; font-size: .82rem; font-weight: 600; }
+    .footer { text-align: center; padding: 20px; color: #9aa0a6; font-size: 0.8rem; }
 
-    /* ── Mobile ── */
+    /* ── Mobile Optimization (Better Experience) ── */
     @media (max-width: 600px) {
-      .hero { padding: 52px 20px 85px; border-radius: 0 0 40px 40px; }
-      .hero::after { border-radius: 0 0 40px 40px; }
-      .hero h1 { font-size: 1.75rem; }
-      .logo { font-size: 2.7rem; }
-      .grades-grid { grid-template-columns: 1fr; }
-      .grades-section { margin-top: -48px; }
+      .hero { padding: 40px 15px 80px; }
+      .hero h1 { font-size: 1.7rem; }
+      
+      .grades-section { margin-top: -35px; padding: 0 10px 40px; }
+      .grades-grid { 
+        grid-template-columns: 1fr; 
+        gap: 15px; 
+      }
+      
+      .grade-card { 
+        padding: 20px 15px; 
+        max-width: 290px; /* تصغير عرض البطاقة لتعطي مساحة جانبية */
+        border-radius: 18px;
+      }
+      
+      .grade-icon { width: 65px; height: 65px; }
+      .grade-num { width: 28px; height: 28px; line-height: 28px; font-size: 0.85rem; }
+      .grade-btn { padding: 8px 20px; font-size: 0.82rem; }
     }
   </style>
 </head>
@@ -176,55 +175,60 @@
 
 <div class="hero">
   <div class="hero-content">
-    <span class="logo">🏥</span>
-    <h1>مكتبة وثائق التمريض</h1>
-    <p>اختر صفك الدراسي وابدأ رحلتك نحو التفوق</p>
+    <h1>الدليل الشامل لطلاب التمريض</h1>
+    <p>المصدر الأول للمحتوى التعليمي المتميز لطلاب التمريض 2026</p>
   </div>
 </div>
 
 <div class="grades-section">
   <div class="grades-grid">
 
-    <!-- Grade 1 — RED -->
     <a href="grade1.html" class="grade-card g1">
       <div class="grade-num">١</div>
-      <div class="grade-icon">🌱</div>
+      <div class="grade-icon">
+        <svg class="icon-svg" viewBox="0 0 24 24">
+          <path d="M12,5.5L16.5,2H21v7c0,1.1-0.9,2-2,2h-1v10c0,0.6-0.4,1-1,1H7c-0.6,0-1-0.4-1-1V11H5c-1.1,0-2-0.9-2-2V2h4.5L12,5.5z M18,13h-3v1h3V13z"/>
+        </svg>
+      </div>
       <h2>الصف الأول</h2>
       <div class="cat-pills">
-        <span class="pill">مبادئ وأسس</span>
         <span class="pill">تشريح</span>
         <span class="pill">فسيولوجي</span>
-        <span class="pill">امتحانات</span>
+        <span class="pill">أسس تمريض</span>
       </div>
-      <span class="grade-btn">دخول ←</span>
+      <span class="grade-btn">دخول المكتبة ←</span>
     </a>
 
-    <!-- Grade 2 — BLUE -->
     <a href="grade2.html" class="grade-card g2">
       <div class="grade-num">٢</div>
-      <div class="grade-icon">🔬</div>
+      <div class="grade-icon">
+        <svg class="icon-svg" viewBox="0 0 24 24">
+          <path d="M12,5.5L16.5,2H21v7c0,1.1-0.9,2-2,2h-1v10c0,0.6-0.4,1-1,1H7c-0.6,0-1-0.4-1-1V11H5c-1.1,0-2-0.9-2-2V2h4.5L12,5.5z M18,13h-3v1h3V13z"/>
+        </svg>
+      </div>
       <h2>الصف الثاني</h2>
       <div class="cat-pills">
         <span class="pill">باطنة وجراحة</span>
-        <span class="pill">صحة المجتمع</span>
-        <span class="pill">طب</span>
-        <span class="pill">امتحانات</span>
+        <span class="pill">صحة مجتمع</span>
+        <span class="pill">فارماكولوجي</span>
       </div>
-      <span class="grade-btn">دخول ←</span>
+      <span class="grade-btn">دخول المكتبة ←</span>
     </a>
 
-    <!-- Grade 3 — GREEN -->
     <a href="grade3.html" class="grade-card g3">
       <div class="grade-num">٣</div>
-      <div class="grade-icon">🎓</div>
+      <div class="grade-icon">
+        <svg class="icon-svg" viewBox="0 0 24 24">
+          <path d="M12,5.5L16.5,2H21v7c0,1.1-0.9,2-2,2h-1v10c0,0.6-0.4,1-1,1H7c-0.6,0-1-0.4-1-1V11H5c-1.1,0-2-0.9-2-2V2h4.5L12,5.5z M18,13h-3v1h3V13z"/>
+        </svg>
+      </div>
       <h2>الصف الثالث</h2>
       <div class="cat-pills">
-        <span class="pill">أطفال</span>
-        <span class="pill">نسا</span>
+        <span class="pill">تمريض أطفال</span>
+        <span class="pill">نسا وتوليد</span>
         <span class="pill">إسعافات</span>
-        <span class="pill">نفسية</span>
       </div>
-      <span class="grade-btn">دخول ←</span>
+      <span class="grade-btn">دخول المكتبة ←</span>
     </a>
 
   </div>

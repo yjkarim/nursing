@@ -299,7 +299,9 @@
 </div>
 
 <script>
-    const GROUP = new URLSearchParams(window.location.search).get("group") || "grade3";
+    const _pathGroup = window.location.pathname.replace(/^\//, '').split('/')[0];
+    const _queryGroup = new URLSearchParams(window.location.search).get("group");
+    const GROUP = _pathGroup || _queryGroup || "grade3";
     let allFiles = [];
     let currentCat = 'الكل';
     let searchTimeout;

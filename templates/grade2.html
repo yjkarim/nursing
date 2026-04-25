@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>وثائق الصف الثاني — تمريضيانو</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body>
+
+<header>
+  <div class="header-content">
+    <a href="index.html" class="back-link">← الرئيسية</a>
+    <h1>وثائق الصف الثاني الثانوي تمريض</h1>
+    <p>مكتبتك الرقمية الذكية لتفوقك الدراسي</p>
+    <div class="creator-label" onclick="toggleAbout()">🩺 The creator : Ibrahim Fayez</div>
+  </div>
+</header>
+
+<div class="main-container">
+  <div class="search-area">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="ابحث عن مادة، امتحان، أو مذكرة...">
+    </div>
+    <button id="refreshBtn" title="تحديث">⟳</button>
+  </div>
+
+  <!-- ══ GRADE 2 CATEGORIES — DO NOT CHANGE ORDER ══ -->
+  <div class="cat-grid">
+    <div class="cat-card active" data-cat="الكل">           <i>🏥</i>الكل</div>
+    <div class="cat-card"        data-cat="باطنة وجراحة">  <i>🫀</i>باطنة وجراحة</div>
+    <div class="cat-card"        data-cat="صحة المجتمع">   <i>🏘️</i>صحة المجتمع</div>
+    <div class="cat-card"        data-cat="طب">             <i>⚕️</i>طب</div>
+    <div class="cat-card"        data-cat="امتحانات">       <i>📝</i>امتحانات</div>
+    <div class="cat-card"        data-cat="ثقافية">         <i>📚</i>ثقافية</div>
+    <div class="cat-card"        data-cat="مواد اخري">      <i>📁</i>مواد اخري</div>
+  </div>
+
+  <div id="fileList"></div>
+</div>
+
+<!-- About Modal -->
+<div id="aboutModal">
+  <div class="about-card">
+    <button class="close-about" onclick="toggleAbout()">&times;</button>
+    <div class="profile-img">إ</div>
+    <h2 style="color:var(--pg);font-weight:900">إبراهيم فايز فوزي حسن</h2>
+    <p style="margin:10px 0;color:#666;font-weight:700">طالب بالصف الثاني الثانوي تمريض</p>
+    <div style="background:var(--pab);padding:12px;border-radius:12px;margin:15px 0">
+      <p style="font-weight:700;color:var(--pg)">📍 مقيد بالمجمع الطبي الدولي</p>
+    </div>
+    <p style="color:var(--accent);font-weight:700;margin-bottom:5px">للتواصل والاستفسار:</p>
+    <a href="tel:01040175436" style="display:inline-block;padding:10px 20px;background:var(--dark);color:#fff;border-radius:10px;text-decoration:none;font-weight:900;letter-spacing:1px">01040175436</a>
+  </div>
+</div>
+
+<script src="shared.js"></script>
+<script>
+/**
+ * ╔══════════════════════════════════════════════════════════╗
+ * ║  GRADE 2 — PAGE CONFIG  (DO NOT COPY TO OTHER PAGES)    ║
+ * ╚══════════════════════════════════════════════════════════╝
+ *
+ * Color: BLUE  (#0984e3 family — matches original source)
+ * Categories: الكل | باطنة وجراحة | صحة المجتمع | طب | امتحانات | ثقافية | مواد اخري
+ *
+ * Mapping rules:
+ *   – امتحانات first (highest priority)
+ *   – باطنة وجراحة: internal medicine + surgical specialties combined
+ *   – صحة المجتمع: community health, public health
+ *   – طب: other medical specialties (عيون، أنف، عظام، جلدية...)
+ *   – ثقافية: cultural/language/civic
+ *   – مواد اخري: catch-all (mapped to 'أخري' by fallback)
+ */
+const CONFIG = {
+  group: 'grade2',
+
+  /* ── BLUE theme ─────────────────────────────────────────────────── */
+  theme: {
+    primary:       '#0984e3',
+    activeBg:      '#f0f7ff',
+    activeShadow:  'rgba(9,132,227,.18)',
+    headerGrad:    'linear-gradient(135deg,rgba(9,132,227,.92),rgba(41,128,185,.88))',
+    badgeBg:       '#eef5ff',
+    dlShadow:      'rgba(9,132,227,.28)',
+  },
+
+  /* ── GRADE 2 UNIQUE MAPPING ────────────────────────────────────── */
+  mapping: {
+    // 1. امتحانات
+    'امتحانات': [
+      'امتحان','امتحانات','شفوي','شفويات','مراجعة','مراجعات',
+      'اسئلة','أسئلة','سؤال','اختبار','exam','final','midterm','quiz',
+    ],
+
+    // 2. باطنة وجراحة — internal medicine + surgery + ortho + cardio
+    'باطنة وجراحة': [
+      'باطنة','باطني','internal','قلب','كبد','كلى','كلية','سكر','ضغط',
+      'تنفسية','هضمية','بولية','دم','دموية','هيماتولوجيا',
+      'جراحة','جراحي','surgery','عملية','عمليات','عام','جرح',
+      'عظام','كسر','كسور','orthopedic','مفصل','عمود فقري','bones',
+      'قلبية','اوعية','أوعية','vascular',
+    ],
+
+    // 3. صحة المجتمع
+    'صحة المجتمع': [
+      'صحة المجتمع','صحة مجتمع','مجتمع','community','public health',
+      'وبائيات','epidemiology','بيئية','رعاية','primary care',
+      'تغذية','nutrition','صحة عامة',
+    ],
+
+    // 4. طب — other specialties
+    'طب': [
+      'عيون','عين','بصر','ophthalmology','شبكية','قرنية',
+      'أنف','انف','أذن','اذن','حنجرة','ent','سمع',
+      'جلدية','جلد','dermatology','تناسلية',
+      'اعصاب','أعصاب','neurology','دماغ','مخ',
+      'نسا','توليد','obstetrics','مواليد',
+      'طب شرعي','forensic',
+    ],
+
+    // 5. ثقافية
+    'ثقافية': [
+      'عربي','عربية','لغة عربية','دين','تربية دينية','وطنية',
+      'إحصاء','احصاء','statistics','رياضيات','math',
+      'إنجليزي','انجليزي','english','لغة',
+    ],
+
+    // 6. مواد اخري — explicit catch (engine falls back to 'أخري' anyway)
+    'مواد اخري': [
+      'اداري','ادارة','management','قانون','اخلاق','ethics',
+    ],
+  },
+};
+
+GradeApp.init(CONFIG);
+</script>
+</body>
+</html>

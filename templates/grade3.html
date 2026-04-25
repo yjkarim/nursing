@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>وثائق الصف الثالث — تمريضيانو</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body>
+
+<header>
+  <div class="header-content">
+    <a href="index.html" class="back-link">← الرئيسية</a>
+    <h1>وثائق الصف الثالث الثانوي تمريض</h1>
+    <p>مكتبتك الرقمية الذكية لتفوقك الدراسي</p>
+    <div class="creator-label" onclick="toggleAbout()">🩺 The creator : Ibrahim Fayez</div>
+  </div>
+</header>
+
+<div class="main-container">
+  <div class="search-area">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="ابحث عن مادة، امتحان، أو مذكرة...">
+    </div>
+    <button id="refreshBtn" title="تحديث">⟳</button>
+  </div>
+
+  <!-- ══ GRADE 3 CATEGORIES — DO NOT CHANGE ORDER ══ -->
+  <div class="cat-grid">
+    <div class="cat-card active" data-cat="الكل">       <i>🏥</i>الكل</div>
+    <div class="cat-card"        data-cat="امتحانات">   <i>📝</i>امتحانات</div>
+    <div class="cat-card"        data-cat="أطفال">      <i>👶</i>أطفال</div>
+    <div class="cat-card"        data-cat="نسا">        <i>🤰</i>نسا</div>
+    <div class="cat-card"        data-cat="إسعافات">    <i>🚑</i>إسعافات</div>
+    <div class="cat-card"        data-cat="صحة">        <i>🏘️</i>صحة</div>
+    <div class="cat-card"        data-cat="نفسية">      <i>🧠</i>نفسية</div>
+    <div class="cat-card"        data-cat="ترمنولوجي"> <i>📖</i>ترمنولوجي</div>
+    <div class="cat-card"        data-cat="ثقافية">     <i>📚</i>ثقافية</div>
+    <div class="cat-card"        data-cat="أخري">       <i>📁</i>أخري</div>
+  </div>
+
+  <div id="fileList"></div>
+</div>
+
+<!-- About Modal -->
+<div id="aboutModal">
+  <div class="about-card">
+    <button class="close-about" onclick="toggleAbout()">&times;</button>
+    <div class="profile-img">إ</div>
+    <h2 style="color:var(--pg);font-weight:900">إبراهيم فايز فوزي حسن</h2>
+    <p style="margin:10px 0;color:#666;font-weight:700">طالب بالصف الثالث الثانوي تمريض</p>
+    <div style="background:var(--pab);padding:12px;border-radius:12px;margin:15px 0">
+      <p style="font-weight:700;color:var(--pg)">📍 مقيد بالمجمع الطبي الدولي</p>
+    </div>
+    <p style="color:var(--accent);font-weight:700;margin-bottom:5px">للتواصل والاستفسار:</p>
+    <a href="tel:01040175436" style="display:inline-block;padding:10px 20px;background:var(--dark);color:#fff;border-radius:10px;text-decoration:none;font-weight:900;letter-spacing:1px">01040175436</a>
+  </div>
+</div>
+
+<script src="shared.js"></script>
+<script>
+/**
+ * ╔══════════════════════════════════════════════════════════╗
+ * ║  GRADE 3 — PAGE CONFIG  (DO NOT COPY TO OTHER PAGES)    ║
+ * ╚══════════════════════════════════════════════════════════╝
+ *
+ * Color: GREEN  (#00b894 family)
+ * Categories: الكل | امتحانات | أطفال | نسا | إسعافات | صحة | نفسية | ترمنولوجي | ثقافية | أخري
+ *
+ * Mapping rules:
+ *   – امتحانات first (highest priority)
+ *   – ترمنولوجي before ثقافية to avoid مصطلحات falling into ثقافية
+ *   – صحة kept narrow (community/public health only) to not swallow other cats
+ */
+const CONFIG = {
+  group: 'grade3',
+
+  /* ── GREEN theme ─────────────────────────────────────────────────── */
+  theme: {
+    primary:       '#00b894',
+    activeBg:      '#f0fdf9',
+    activeShadow:  'rgba(0,184,148,.18)',
+    headerGrad:    'linear-gradient(135deg,rgba(0,184,148,.92),rgba(0,150,120,.88))',
+    badgeBg:       '#edfaf6',
+    dlShadow:      'rgba(0,184,148,.28)',
+  },
+
+  /* ── GRADE 3 UNIQUE MAPPING ────────────────────────────────────── */
+  mapping: {
+    // 1. امتحانات
+    'امتحانات': [
+      'امتحان','امتحانات','شفوي','شفويات','مراجعة','مراجعات',
+      'اسئلة','أسئلة','سؤال','اختبار','exam','final','midterm','quiz',
+    ],
+
+    // 2. أطفال
+    'أطفال': [
+      'اطفال','أطفال','طفل','رضيع','رضع','حديث الولادة','نيونات',
+      'pediatric','pediatrics','paediatric','حضانة اطفال',
+    ],
+
+    // 3. نسا — obstetrics & gynecology
+    'نسا': [
+      'نسا','توليد','مواليد','حمل','وضع','ولادة','نفاس',
+      'obstetrics','gynecology','gynaecology','نساء وتوليد',
+    ],
+
+    // 4. إسعافات
+    'إسعافات': [
+      'اسعافات','إسعافات','اسعاف','إسعاف','طوارئ','emergency',
+      'first aid','صدمة','اختناق','انعاش','cpr','حروق','كسور طارئة',
+    ],
+
+    // 5. صحة — community / public health
+    'صحة': [
+      'صحة المجتمع','صحة مجتمع','مجتمع','community health','public health',
+      'وبائيات','epidemiology','رعاية','بيئية','تغذية','nutrition',
+    ],
+
+    // 6. نفسية
+    'نفسية': [
+      'نفسية','نفسي','نفس','psychiatry','psychiatric','mental health',
+      'اضطراب','سلوك','قلق','اكتئاب','depression','anxiety',
+    ],
+
+    // 7. ترمنولوجي — before ثقافية so medical terms don't fall through
+    'ترمنولوجي': [
+      'ترمنولوجي','ترمينولوجي','terminology','medical terms','مصطلحات',
+      'مصطلح','medical terminology','مفردات طبية',
+    ],
+
+    // 8. ثقافية
+    'ثقافية': [
+      'عربي','عربية','لغة عربية','دين','تربية دينية','وطنية',
+      'إحصاء','احصاء','statistics','رياضيات','math',
+      'إنجليزي','انجليزي','english','لغة',
+    ],
+  },
+};
+
+GradeApp.init(CONFIG);
+</script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>وثائق الصف الأول — تمريضيانو</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body>
+
+<header>
+  <div class="header-content">
+    <a href="index.html" class="back-link">← الرئيسية</a>
+    <h1>وثائق الصف الأول الثانوي تمريض</h1>
+    <p>مكتبتك الرقمية الذكية لتفوقك الدراسي</p>
+    <div class="creator-label" onclick="toggleAbout()">🩺 The creator : Ibrahim Fayez</div>
+  </div>
+</header>
+
+<div class="main-container">
+  <div class="search-area">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="ابحث عن مادة، امتحان، أو مذكرة...">
+    </div>
+    <button id="refreshBtn" title="تحديث">⟳</button>
+  </div>
+
+  <!-- ══ GRADE 1 CATEGORIES — DO NOT CHANGE ORDER ══ -->
+  <div class="cat-grid">
+    <div class="cat-card active" data-cat="الكل">       <i>🏥</i>الكل</div>
+    <div class="cat-card"        data-cat="مبادئ وأسس"> <i>📗</i>مبادئ وأسس</div>
+    <div class="cat-card"        data-cat="تشريح">      <i>🦴</i>تشريح</div>
+    <div class="cat-card"        data-cat="فسيولوجي">   <i>🔬</i>فسيولوجي</div>
+    <div class="cat-card"        data-cat="امتحانات">   <i>📝</i>امتحانات</div>
+    <div class="cat-card"        data-cat="ثقافية ودينية"><i>📚</i>ثقافية ودينية</div>
+    <div class="cat-card"        data-cat="أخري">       <i>📁</i>أخري</div>
+  </div>
+
+  <div id="fileList"></div>
+</div>
+
+<!-- About Modal -->
+<div id="aboutModal">
+  <div class="about-card">
+    <button class="close-about" onclick="toggleAbout()">&times;</button>
+    <div class="profile-img">إ</div>
+    <h2 style="color:var(--pg);font-weight:900">إبراهيم فايز فوزي حسن</h2>
+    <p style="margin:10px 0;color:#666;font-weight:700">طالب بالصف الأول الثانوي تمريض</p>
+    <div style="background:var(--pab);padding:12px;border-radius:12px;margin:15px 0">
+      <p style="font-weight:700;color:var(--pg)">📍 مقيد بالمجمع الطبي الدولي</p>
+    </div>
+    <p style="color:var(--accent);font-weight:700;margin-bottom:5px">للتواصل والاستفسار:</p>
+    <a href="tel:01040175436" style="display:inline-block;padding:10px 20px;background:var(--dark);color:#fff;border-radius:10px;text-decoration:none;font-weight:900;letter-spacing:1px">01040175436</a>
+  </div>
+</div>
+
+<script src="shared.js"></script>
+<script>
+/**
+ * ╔══════════════════════════════════════════════════════════╗
+ * ║  GRADE 1 — PAGE CONFIG  (DO NOT COPY TO OTHER PAGES)    ║
+ * ╚══════════════════════════════════════════════════════════╝
+ *
+ * Color: RED  (#e74c3c family)
+ * Categories: الكل | مبادئ وأسس | تشريح | فسيولوجي | امتحانات | ثقافية ودينية | أخري
+ *
+ * Mapping rules:
+ *   – ordered specific → general (first match wins)
+ *   – keywords include both hamza/alef variants for broad matching
+ *   – normalizeAr() in engine handles أ/ا/إ/آ variants automatically,
+ *     but listing both forms here acts as extra safety
+ */
+const CONFIG = {
+  group: 'grade1',
+
+  /* ── RED theme ─────────────────────────────────────────────────── */
+  theme: {
+    primary:       '#e74c3c',
+    activeBg:      '#fff5f5',
+    activeShadow:  'rgba(231,76,60,.18)',
+    headerGrad:    'linear-gradient(135deg,rgba(231,76,60,.92),rgba(192,57,43,.85))',
+    badgeBg:       '#fff0ef',
+    dlShadow:      'rgba(231,76,60,.28)',
+  },
+
+  /* ── GRADE 1 UNIQUE MAPPING ────────────────────────────────────── */
+  mapping: {
+    // 1. امتحانات — highest priority so exam files don't fall into subject cats
+    'امتحانات': [
+      'امتحان','امتحانات','شفوي','شفويات','مراجعة','مراجعات',
+      'اسئلة','أسئلة','سؤال','اختبار','exam','final','midterm','quiz',
+    ],
+
+    // 2. مبادئ وأسس — introductory/foundational subjects
+    'مبادئ وأسس': [
+      'مبادئ','اسس','أسس','اساسيات','أساسيات','مدخل',
+      'مقدمة','تمريض عام','اخلاقيات','أخلاقيات','ethics',
+      'مهارات','مهاري','skills','practical','إجراء','اجراء',
+      'حقن','ضمادة','قياس','ضغط الدم','علامات حيوية',
+    ],
+
+    // 3. تشريح
+    'تشريح': [
+      'تشريح','anatomy','هيكل','عظام','عضلات','مفاصل',
+      'جهاز عظمي','جهاز عضلي','الجهاز','اعضاء','أعضاء',
+      'خلية','خلايا','انسجة','أنسجة','tissue',
+    ],
+
+    // 4. فسيولوجي — physiology + related science subjects
+    'فسيولوجي': [
+      'فسيولوجي','فسيولوجيا','physiology','وظائف الاعضاء','وظائف الأعضاء',
+      'دوري','عصبي','هضمي','تنفسي','بولي','توليدي','لمفاوي','غدد','هرمون',
+      'كيمياء','كيميائي','chemistry','عضوية','غير عضوية','تفاعل',
+      'احياء','أحياء','biology','وراثة','جينات','بكتيريا','فيروس',
+      'ميكروب','جرثوم','microbiology','طفيلي',
+    ],
+
+    // 5. ثقافية ودينية — cultural, religious, language, civic
+    'ثقافية ودينية': [
+      'عربي','عربية','لغة عربية','دين','تربية دينية','وطنية','تربية وطنية',
+      'إحصاء','احصاء','statistics','رياضيات','رياضة','math',
+      'إنجليزي','انجليزي','english','لغة',
+    ],
+  },
+};
+
+GradeApp.init(CONFIG);
+</script>
+</body>
+</html>

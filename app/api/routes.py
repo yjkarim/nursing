@@ -10,10 +10,10 @@ from urllib.parse import quote
 from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import FileResponse, Response, StreamingResponse
 
-import cache_service as cs
-import redis_service as rs
-import telegram_service as ts
-from config import MIN_HITS_TO_CACHE, CHUNK_SIZE
+from app.services import cache_service as cs
+from app.services import redis_service as rs
+from app.services import telegram_service as ts
+from app.core.config import MIN_HITS_TO_CACHE, CHUNK_SIZE
 
 log = logging.getLogger("tg.routes")
 router = APIRouter()

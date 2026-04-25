@@ -9,7 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* التبديل للون الأحمر الأساسي */
             --primary: #d63031; 
             --primary-light: rgba(214, 48, 49, 0.1);
             --secondary: #e17055;
@@ -21,7 +20,12 @@
             --radius: 18px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        /* FIX: Removed global transition: all */
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
 
         body {
             background-color: #fcf8f8;
@@ -31,7 +35,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* ── Header باللون الأحمر ── */
         header {
             position: relative;
             height: 320px;
@@ -69,9 +72,10 @@
             border: 1px solid rgba(255,255,255,0.4);
             cursor: pointer;
             font-weight: 700;
+            transition: background 0.3s ease; /* Specific transition */
         }
+        .creator-label:hover { background: rgba(255, 255, 255, 0.3); }
 
-        /* ── Main Container ── */
         .main-container { max-width: 1100px; margin: -50px auto 0; padding: 0 20px; position: relative; z-index: 5; }
 
         .search-area {
@@ -92,6 +96,7 @@
             border-radius: 12px;
             outline: none;
             font-family: inherit;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
         #searchInput:focus { border-color: var(--primary); background: #fffafa; box-shadow: 0 0 0 4px var(--primary-light); }
 
@@ -106,9 +111,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: transform 0.2s ease;
         }
+        #refreshBtn:active { transform: scale(0.95); }
 
-        /* ── الأقسام الجديدة المطلوبة ── */
         .cat-container { margin-bottom: 30px; position: relative; }
         .cat-grid {
             display: flex;
@@ -134,6 +140,7 @@
             font-size: 0.85rem;
             font-weight: 800;
             scroll-snap-align: start;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s, border-color 0.3s, color 0.3s;
         }
 
         .cat-card.active {
@@ -146,12 +153,14 @@
 
         .cat-card i { display: block; font-size: 1.6rem; margin-bottom: 8px; font-style: normal; }
 
-        /* ── قائمة الملفات ── */
+        /* FIX: Optimized grid layout stability */
         #fileList {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 20px;
             padding-bottom: 50px;
+            align-items: start; /* Prevents uneven card stretching */
+            min-height: 400px; /* Prevents page jump when clearing list */
         }
 
         .file-card {
@@ -160,6 +169,11 @@
             padding: 22px;
             box-shadow: var(--shadow);
             border: 1px solid rgba(214, 48, 49, 0.05);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
+            will-change: transform, opacity; /* Perf optimization */
+            min-height: 200px; /* Layout stabilization */
+            display: flex;
+            flex-direction: column;
         }
 
         .file-card:hover { transform: translateY(-8px); border-color: var(--primary); }
@@ -173,7 +187,7 @@
             color: var(--primary);
         }
 
-        .file-name { font-weight: 700; font-size: 0.95rem; margin-bottom: 12px; color: var(--dark); line-height: 1.4; }
+        .file-name { font-weight: 700; font-size: 0.95rem; margin-bottom: 12px; color: var(--dark); line-height: 1.4; flex-grow: 1; }
 
         .file-badge {
             font-size: 0.7rem;
@@ -186,21 +200,30 @@
         }
 
         .file-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 22px; }
-        .btn { padding: 12px; border-radius: 10px; text-decoration: none; text-align: center; font-size: 0.85rem; font-weight: 800; }
+        .btn { padding: 12px; border-radius: 10px; text-decoration: none; text-align: center; font-size: 0.85rem; font-weight: 800; transition: background 0.2s, transform 0.1s; }
+        .btn:active { transform: scale(0.98); }
         .btn-preview { background: #f1f2f6; color: var(--dark); }
         .btn-download { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(214, 48, 49, 0.2); }
 
-        /* ── Modal ── */
         #aboutModal {
             position: fixed; inset: 0; background: rgba(45, 52, 54, 0.6); backdrop-filter: blur(8px);
             display: none; align-items: center; justify-content: center; z-index: 1000;
         }
-        .about-card { background: white; padding: 35px; border-radius: 30px; width: 90%; max-width: 400px; text-align: center; opacity: 0; transform: scale(0.9); }
+        .about-card { 
+            background: white; padding: 35px; border-radius: 30px; width: 90%; max-width: 400px; text-align: center; 
+            opacity: 0; transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+        }
         .about-card.show { opacity: 1; transform: scale(1); }
 
         @media (max-width: 600px) {
             h1 { font-size: 1.7rem; }
             #fileList { grid-template-columns: 1fr; }
+        }
+
+        @keyframes slideUp { 
+            from { opacity: 0; transform: translateY(20px); } 
+            to { opacity: 1; transform: translateY(0); } 
         }
     </style>
 </head>
@@ -208,7 +231,7 @@
 
 <header>
     <div class="header-content">
-        <h1>وثائق الصف الاول الثانوي تمريض</h1>
+        <h1>وثائق الصف الأول الثانوي تمريض</h1>
         <p>مكتبتك الرقمية الذكية لتفوقك الدراسي</p>
         <div class="creator-label" onclick="toggleAbout()">
         🩺 The creator : Ibrahim Fayez
@@ -242,7 +265,7 @@
 <div id="aboutModal" onclick="toggleAbout()">
     <div class="about-card" onclick="event.stopPropagation()">
         <h2 style="color:var(--primary); font-weight:900">إبراهيم فايز فوزي حسن</h2>
-        <p style="margin:10px 0; color:#666; font-weight:700">طالب بالصف الثاث الثانوي تمريض</p>
+        <p style="margin:10px 0; color:#666; font-weight:700">طالب بالصف الثالث الثانوي تمريض</p>
         <div style="background: #fff5f5; padding: 12px; border-radius: 12px; margin: 15px 0;">
             <p style="font-weight:700; color:var(--primary)">📍 مقيد بالمجمع الطبي الدولي</p>
         </div>
@@ -256,7 +279,6 @@
     let currentCat = 'الكل';
     let searchTimeout;
 
-    // Mapping المحسن بناءً على طلبك
     const mapping = {
         'مبادئ وأسس': ['مبادئ', 'اسس', 'أسس', 'تمريض', 'أساسيات', 'اساسيات', 'fundamentals', 'nursing'],
         'تشريح': ['تشريح', 'اناطومي', 'anatomy', 'جسم الإنسان', 'العظام'],
@@ -266,17 +288,36 @@
         'اخري': []
     };
 
+    // Helper functions
     function cleanFileName(name) {
         return name.replace(/قناة|تمريضيانو|[\-_]/g, ' ').replace(/\s+/g, ' ').trim();
     }
 
     function detectCategory(name) {
-        name = name.toLowerCase();
+        const lowerName = name.toLowerCase();
         for (let [cat, keys] of Object.entries(mapping)) {
             if (cat === 'اخري') continue;
-            if (keys.some(k => name.includes(k))) return cat;
+            if (keys.some(k => lowerName.includes(k))) return cat;
         }
         return 'اخري';
+    }
+
+    function fmtSize(b){
+        if(!b) return '---';
+        return b < 1048576 ? (b/1024).toFixed(1)+' KB' : (b/1048576).toFixed(1)+' MB';
+    }
+
+    /**
+     * Optimized Data Processing
+     * Calculates categories and names once to save performance during search/filter
+     */
+    function processFiles(files) {
+        return files.map(f => ({
+            ...f,
+            displayName: cleanFileName(f.name),
+            category: detectCategory(f.name),
+            searchKey: f.name.toLowerCase()
+        }));
     }
 
     function render() {
@@ -284,13 +325,11 @@
             const list = document.getElementById('fileList');
             const search = document.getElementById('searchInput').value.toLowerCase();
             
+            // Optimization: Filter logic uses pre-computed 'category' and 'searchKey'
             const filtered = allFiles.filter(f => {
-                const name = f.name.toLowerCase();
-                const matchesSearch = name.includes(search);
+                const matchesSearch = f.searchKey.includes(search);
                 if(currentCat === 'الكل') return matchesSearch;
-                
-                const fileCat = detectCategory(f.name);
-                return matchesSearch && (fileCat === currentCat);
+                return matchesSearch && (f.category === currentCat);
             });
 
             const fragment = document.createDocumentFragment();
@@ -304,12 +343,17 @@
                 filtered.forEach((f, i) => {
                     const card = document.createElement('div');
                     card.className = 'file-card';
-                    card.style.animation = `slideUp 0.4s ease backwards ${i * 0.03}s`;
+                    
+                    // FIX: Animation delay capped to first 20 items to prevent layout lag on long lists
+                    if (i < 20) {
+                        card.style.animation = `slideUp 0.4s ease backwards ${i * 0.04}s`;
+                    }
+
                     card.innerHTML = `
                         <div class="file-type-icon">📄</div>
-                        <div class="file-name">${cleanFileName(f.name)}</div>
+                        <div class="file-name">${f.displayName}</div>
                         <div class="file-meta">
-                            <span class="file-badge">القسم: ${detectCategory(f.name)}</span>
+                            <span class="file-badge">القسم: ${f.category}</span>
                             <span class="file-badge" style="background:#f1f2f6; color:#777">📦 ${fmtSize(f.size)}</span>
                         </div>
                         <div class="file-actions">
@@ -320,36 +364,37 @@
                     fragment.appendChild(card);
                 });
             }
+            
+            // FIX: Fast clear and replace to minimize reflow
             list.innerHTML = '';
             list.appendChild(fragment);
         });
     }
 
-    function fmtSize(b){
-        if(!b) return '---';
-        return b < 1048576 ? (b/1024).toFixed(1)+' KB' : (b/1048576).toFixed(1)+' MB';
-    }
-
-    // التحكم بالبحث والتصنيفات
+    // Event Handlers
     document.getElementById('catGrid').addEventListener('click', (e) => {
         const card = e.target.closest('.cat-card');
         if (!card) return;
+        
         currentCat = card.dataset.cat;
         document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('active'));
         card.classList.add('active');
+        
         card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
         render();
     });
 
+    // Debounced Search
     document.getElementById('searchInput').addEventListener('input', () => {
         clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(render, 150);
+        searchTimeout = setTimeout(render, 100); // Faster response time for modern CPUs
     });
 
     async function loadData() {
         try {
             const res = await fetch(`/api/files?group=${GROUP}`);
-            allFiles = await res.json();
+            const data = await res.json();
+            allFiles = processFiles(data);
             render();
         } catch(e) { console.error("Load Error"); }
     }
@@ -372,13 +417,13 @@
         try {
             const res = await fetch(`/api/refresh?group=${GROUP}`, { method:'POST' });
             const data = await res.json();
-            allFiles = data.files;
+            allFiles = processFiles(data.files);
             render();
         } catch(e) { alert("فشلت المزامنة!"); }
         finally { btn.innerHTML = '⟳'; }
     }
 
-    // دعم السحب للشريط الأفقي
+    // Scroll drag support for categories
     const slider = document.getElementById('catGrid');
     let isDown = false, startX, scrollLeft;
     slider.addEventListener('mousedown', (e) => { isDown = true; startX = e.pageX - slider.offsetLeft; scrollLeft = slider.scrollLeft; });
@@ -386,6 +431,7 @@
     slider.addEventListener('mouseup', () => isDown = false);
     slider.addEventListener('mousemove', (e) => {
         if (!isDown) return;
+        e.preventDefault();
         const x = e.pageX - slider.offsetLeft;
         const walk = (x - startX) * 2;
         slider.scrollLeft = scrollLeft - walk;
@@ -393,10 +439,5 @@
 
     loadData();
 </script>
-
-<style>
-    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-</style>
-
 </body>
 </html>

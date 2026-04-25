@@ -14,7 +14,7 @@ import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI , HTTPException
 from fastapi.responses import HTMLResponse
 
 from app.core.config import HERE, GROUPS  # adjust import if GROUPS lives elsewhere

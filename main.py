@@ -47,14 +47,20 @@ app = FastAPI(
 app.include_router(router)
 
 
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
+async def index() -> HTMLResponse:
+    html = (HERE / "templates" / "index.html").read_text("utf-8")
+    return HTMLResponse(html)
+
 @app.get("/{group_name}", response_class=HTMLResponse, include_in_schema=False)
 async def group_page(group_name: str) -> HTMLResponse:
     """
-    Serves index.html for clean path-based group URLs like /grade1, /grade2.
-    Falls through (404) for any group_name not in the known GROUPS registry,
-    which also protects against accidentally catching /favicon.ico etc.
+    Serves templates/{group_name}.html if the file exists.
+    Returns 404 if no matching template is found.
+    Never intercepts /api/* because those routes are registered first.
     """
-    if group_name not in GROUPS:          # GROUPS is a dict or set of valid keys
-        raise HTTPException(status_code=404, detail="Group not found")
-    html = (HERE / "templates" / "index.html").read_text("utf-8")
+    template = HERE / "templates" / f"{group_name}.html"
+    if not template.exists():
+        raise HTTPException(status_code=404, detail=f"Page '{group_name}' not found")
+    html = template.read_text("utf-8")
     return HTMLResponse(html)

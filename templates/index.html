@@ -7,17 +7,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* ألوان صريحة وواضحة (غير باهتة) */
-            --main-blue: #0056ff;    /* أزرق قوي */
-            --main-red: #d90429;     /* أحمر صريح */
-            --main-green: #00a86b;   /* أخضر زمردي */
-            --text-dark: #111111;    /* أسود غامق جداً لوضوح النص */
-            --bg-page: #f0f2f5;      /* خلفية رمادية فاتحة جداً لإبراز الكارت الأبيض */
-            
-            /* ظل للنصوص لإبرازها */
+            --main-blue: #0056ff;
+            --main-red: #d90429;
+            --main-green: #00a86b;
+            --text-dark: #111111;
+            --bg-page: #f0f2f5;
             --text-shadow: 1px 1px 2px rgba(0,0,0,0.15);
-            /* ظل للعناصر لمنحها عمقاً */
-            --box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            --box-shadow: 0 15px 30px rgba(0,0,0,0.1);
         }
 
         * {
@@ -25,7 +21,6 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Tajawal', sans-serif;
-            /* تطبيق ظل خفيف على كل النصوص بشكل افتراضي للوضوح */
             text-shadow: var(--text-shadow);
         }
 
@@ -35,189 +30,144 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 15px;
             color: var(--text-dark);
         }
 
-        /* كارت المحتوى الرئيسي */
+        /* تصغير الكارت */
         .card {
             background: #ffffff;
             width: 100%;
-            max-width: 500px;
-            padding: 3.5rem 2.5rem 2rem;
-            border-radius: 30px;
+            max-width: 380px; /* تم تقليل العرض من 500 إلى 380 */
+            padding: 2rem 1.5rem 1.5rem; /* تقليل الهوامش الداخلية */
+            border-radius: 25px;
             box-shadow: var(--box-shadow);
             text-align: center;
-            border: 2px solid #e1e8ed; /* إطار خفيف لتحديد الكارت */
+            border: 2px solid #e1e8ed;
             position: relative;
         }
 
-        /* الرسالة الرئيسية */
         .header-msg {
-            font-size: 1.8rem;
-            font-weight: 800; /* خط عريض جداً */
-            margin-bottom: 1rem;
-            color: var(--text-dark);
-            line-height: 1.4;
+            font-size: 1.4rem; /* تصغير حجم الخط ليناسب الكارت الصغير */
+            font-weight: 800;
+            margin-bottom: 0.8rem;
+            line-height: 1.3;
         }
 
         .sub-msg {
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             font-weight: 500;
-            color: #444; /* رمادي غامق وواضح */
-            margin-bottom: 2.5rem;
-            line-height: 1.6;
+            color: #444;
+            margin-bottom: 1.5rem;
         }
 
-        /* حاوية العداد */
         .timer-container {
-            margin-bottom: 2.5rem;
+            margin-bottom: 1.5rem;
         }
 
-        /* رقم العداد (واضح وبدون تأثيرات حركية مشتتة) */
         .timer-display {
-            font-size: 3rem;
+            font-size: 2.2rem;
             font-weight: 800;
             color: var(--main-red);
-            background: #fff0f0; /* خلفية محمرة خفيفة وواضحة */
-            width: 100px;
-            height: 100px;
+            background: #fff0f0;
+            width: 75px; /* تصغير حجم دائرة العداد */
+            height: 75px;
             display: inline-flex;
             justify-content: center;
             align-items: center;
             border-radius: 50%;
-            border: 4px solid var(--main-red); /* إطار سميك وواضح */
-            box-shadow: 0 4px 10px rgba(217, 4, 41, 0.2); /* ظل ملون */
+            border: 3px solid var(--main-red);
+            box-shadow: 0 4px 8px rgba(217, 4, 41, 0.15);
         }
 
-        /* عنوان الرابط الجديد */
         .link-title {
             display: block;
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: 700;
             color: var(--main-green);
-            margin-bottom: 12px;
-            text-align: right; /* محاذاة لليمين للوضوح */
-            padding-right: 10px;
+            margin-bottom: 8px;
+            text-align: right;
+            padding-right: 5px;
         }
 
-        /* صندوق الرابط */
         .url-box {
-            background: #f0fff4; /* خلفية خضراء فاتحة وصريحة */
-            border: 2px solid var(--main-green); /* إطار صريح */
-            padding: 1.5rem;
-            border-radius: 18px;
+            background: #f0fff4;
+            border: 2px solid var(--main-green);
+            padding: 1rem; /* تقليل الـ padding */
+            border-radius: 15px;
             cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            margin-bottom: 2.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+            margin-bottom: 1.5rem;
         }
 
-        .url-box:hover {
-            background: #e6ffec;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
-        }
-
-        /* نص الرابط */
         .url-text {
             color: var(--main-green);
-            font-family: 'Courier New', Courier, monospace; /* خط مونو لتمييز الروابط */
+            font-family: monospace;
             font-weight: 700;
-            font-size: 1rem;
+            font-size: 0.85rem; /* تصغير حجم الخط */
             word-break: break-all;
             display: block;
-            text-shadow: none; /* إلغاء الظل هنا ليبقى الرابط حاداً */
+            text-shadow: none;
         }
 
-        /* حث على النسخ */
-        .copy-action {
-            font-size: 0.8rem;
-            color: #666;
-            margin-top: 10px;
-            display: block;
-            font-weight: 500;
-        }
-
-        /* زر التحويل */
         .redirect-btn {
             background: var(--main-blue);
             color: white;
             border: none;
             width: 100%;
-            padding: 1.3rem;
-            border-radius: 18px;
-            font-size: 1.2rem;
+            padding: 1rem;
+            border-radius: 15px;
+            font-size: 1.1rem;
             font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 8px 20px rgba(0, 86, 255, 0.3); /* ظل أزرق واضح */
-            transition: all 0.3s ease;
-            margin-bottom: 2rem;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3); /* ظل أثقل للنص الأبيض */
+            box-shadow: 0 6px 15px rgba(0, 86, 255, 0.25);
+            margin-bottom: 1.5rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
         }
 
-        .redirect-btn:hover {
-            background: #0044cc;
-            transform: translateY(-2px);
-            box-shadow: 0 12px 25px rgba(0, 86, 255, 0.4);
-        }
-
-        /* التوقيع */
         .credit-footer {
-            padding-top: 1.5rem;
-            border-top: 2px solid #eee;
+            padding-top: 1rem;
+            border-top: 2px solid #f1f5f9;
             color: #555;
-            font-size: 0.95rem;
-            font-weight: 700; /* خط أوضح للتوقيع */
+            font-size: 0.85rem;
+            font-weight: 700;
         }
 
-        /* تنبيه النسخ */
         #copyToast {
             position: fixed;
             bottom: -100px;
             left: 50%;
             transform: translateX(-50%);
-            background: var(--text-dark);
+            background: #1e293b;
             color: white;
-            padding: 15px 30px;
+            padding: 12px 25px;
             border-radius: 50px;
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: 700;
-            transition: bottom 0.4s ease-out;
+            transition: bottom 0.4s;
             z-index: 1000;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            text-shadow: none;
         }
-        #copyToast.visible { bottom: 30px; }
-
-        /* موبايل */
-        @media (max-width: 480px) {
-            .card { padding: 2.5rem 1.5rem 1.5rem; }
-            .header-msg { font-size: 1.5rem; }
-            .timer-display { width: 80px; height: 80px; font-size: 2.5rem; }
-            .redirect-btn { font-size: 1.1rem; padding: 1.1rem; }
-        }
+        #copyToast.visible { bottom: 20px; }
     </style>
 </head>
 <body>
 
-    <div id="copyToast">تم نسخ الرابط الجديد بنجاح! 📋</div>
+    <div id="copyToast">تم نسخ الرابط! 📋</div>
 
     <div class="card">
         <h1 class="header-msg">بس هنا رايح فين ...... 😂</h1>
-        <p class="sub-msg">تم تغيير لينك الموقع بشكل كامل<br>يلا مستنيك هناك 😎</p>
+        <p class="sub-msg">تم تغيير لينك الموقع بالكامل<br>مستنيك هناك 😎</p>
 
         <div class="timer-container">
             <div class="timer-display" id="timeCount">15</div>
         </div>
 
-        <span class="link-title">الرابط الجديد المباشر:</span>
+        <span class="link-title">الرابط الجديد:</span>
         <div class="url-box" onclick="handleCopy()">
-            <span class="url-text" id="rawLink">https://my.nursing.workers.dev/</span>
-            <span class="copy-action">اضغط على المستطيل للنسخ السريع 📋</span>
+            <span class="url-text">https://my.nursing.workers.dev/</span>
         </div>
 
-        <button class="redirect-btn" onclick="doRedirect()">فهمت [يتم التحويل الآن]</button>
+        <button class="redirect-btn" onclick="doRedirect()">فهمت [تحويل الآن]</button>
 
         <div class="credit-footer">
             مع تحيات / الطالب إبراهيم فايز
@@ -229,28 +179,22 @@
         let timeLeft = 15;
         const countEl = document.getElementById('timeCount');
 
-        // إدارة العداد
-        const countdownInterval = setInterval(() => {
+        const interval = setInterval(() => {
             timeLeft--;
             countEl.innerText = timeLeft;
-
             if (timeLeft <= 0) {
-                clearInterval(countdownInterval);
+                clearInterval(interval);
                 doRedirect();
             }
         }, 1000);
 
-        // وظيفة التحويل
-        function doRedirect() {
-            window.location.href = targetUrl;
-        }
+        function doRedirect() { window.location.href = targetUrl; }
 
-        // وظيفة النسخ والتنبيه
         function handleCopy() {
             navigator.clipboard.writeText(targetUrl).then(() => {
                 const toast = document.getElementById('copyToast');
                 toast.classList.add('visible');
-                setTimeout(() => toast.classList.remove('visible'), 2500);
+                setTimeout(() => toast.classList.remove('visible'), 2000);
             });
         }
     </script>
